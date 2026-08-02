@@ -37,6 +37,7 @@ jobs:
           # These are PUBLIC (see storefront/.env.example), NOT backend secrets.
           VITE_MEDUSA_BACKEND_URL: https://api.yourdailydrip.com
           VITE_MEDUSA_PUBLISHABLE_KEY: pk_03c87a2a2bb94fc7817544f7a44ace3f4dd63b4548fd79030cbcf70bc4a3b189
+          VITE_RAZORPAY_KEY_ID: rzp_live_TKyZpQb9rjHZi2
         run: bun run build
 
       - name: Deploy to Cloudflare Workers
