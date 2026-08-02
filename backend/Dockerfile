@@ -7,8 +7,10 @@
 #   ├── package.json / package-lock.json / node_modules  (npm workspace root)
 #   └── apps/backend                                      (medusa app, built)
 #
-# Build: `medusa build` (turbo build) compiles the server to apps/backend/dist
-# and the admin dashboard bundle to apps/backend/.medusa/client.
+# Build: `medusa build` (turbo build) compiles the server to
+# apps/backend/.medusa/server and the admin dashboard bundle to
+# apps/backend/.medusa/server/public/admin, then copies it to
+# apps/backend/public/admin (the path `medusa start` expects at boot).
 # Run:   `medusa start` (apps/backend `start` script) serves both on :9000.
 
 FROM node:20-alpine AS deps
