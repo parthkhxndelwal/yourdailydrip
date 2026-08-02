@@ -20,6 +20,11 @@ WORKDIR /app
 # re-reads the allowScripts allow-list from root package.json so the
 # esbuild/swc/msgpackr/protobufjs/telemetry install scripts run in-image.
 COPY package.json package-lock.json .npmrc ./
+# patches/ feeds the root postinstall hook ("patch-package"), which reapplies
+# the medusa-plugin-razorpay-v2 fixes during npm ci (scripts run in-image; no
+# --ignore-scripts). Without it, postinstall would no-op and the build would
+# ship the unpatched plugin.
+COPY patches ./patches
 COPY apps/backend/package.json apps/backend/package.json
 RUN npm ci
 

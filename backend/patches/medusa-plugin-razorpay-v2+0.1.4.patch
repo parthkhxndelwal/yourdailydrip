@@ -1,0 +1,31 @@
+diff --git a/node_modules/medusa-plugin-razorpay-v2/.medusa/server/src/providers/payment-razorpay/src/core/razorpay-base.js b/node_modules/medusa-plugin-razorpay-v2/.medusa/server/src/providers/payment-razorpay/src/core/razorpay-base.js
+index 3657949..f297427 100644
+--- a/node_modules/medusa-plugin-razorpay-v2/.medusa/server/src/providers/payment-razorpay/src/core/razorpay-base.js
++++ b/node_modules/medusa-plugin-razorpay-v2/.medusa/server/src/providers/payment-razorpay/src/core/razorpay-base.js
+@@ -12,7 +12,8 @@ class RazorpayBase extends utils_1.AbstractPaymentProvider {
+         super(container, options);
+         this.options_ = options;
+         this.logger = container[utils_1.ContainerRegistrationKeys.LOGGER];
+-        this.paymentService = container[utils_1.Modules.PAYMENT];
++        // Module container key; Modules.PAYMENT ("payment") only exists in the app container.
++        this.paymentService = container["paymentModuleService"];
+         this.container_ = container;
+         this.options_ = options;
+         this.init();
+@@ -188,6 +189,16 @@ class RazorpayBase extends utils_1.AbstractPaymentProvider {
+         const toPay = this.getToPay(amount, currency_code);
+         try {
+             const razorpayOrderCreateRequest = this.getRazorpayOrderCreateRequestBody(toPay, currency_code);
++            // TODO-9 PATCH (webhook notes, SGFGOV #11): Razorpay copies order
++            // notes into payment notes; the webhook maps events via
++            // paymentData.notes.session_id, which is absent without this block.
++            // Reapply per apps/backend/patches/razorpay-webhook-notes.md.
++            if (paymentSessionId) {
++                razorpayOrderCreateRequest.notes = {
++                    session_id: paymentSessionId,
++                    medusa_payment_session_id: paymentSessionId
++                };
++            }
+             const razorpayOrder = await this.razorpay_.orders.create(razorpayOrderCreateRequest);
+             if (!paymentSessionId) {
+                 throw new utils_1.MedusaError(utils_1.MedusaError.Types.INVALID_DATA, "Payment session ID is required");
