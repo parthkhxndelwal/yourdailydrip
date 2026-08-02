@@ -102,7 +102,7 @@ export function Chatbot() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="Chat with us"
-        className="fixed right-4 bottom-4 z-50 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-soft)] transition-transform hover:scale-105"
+        className="chat-toggle-hidden fixed right-4 bottom-4 z-50 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-soft)] transition-transform hover:scale-105"
       >
         <MessageCircle size={18} /> Chat
       </button>

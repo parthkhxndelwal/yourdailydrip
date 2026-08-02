@@ -176,3 +176,9 @@
     transform: translateX(-50%);
   }
 }
+
+/* Chat launcher is hidden by request (code kept for re-enable).
+   Remove this rule to bring the floating chat button back. */
+.chat-toggle-hidden {
+  display: none;
+}
