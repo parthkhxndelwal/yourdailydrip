@@ -1,0 +1,73 @@
+import { loadEnv, defineConfig } from "@medusajs/framework/utils"
+
+loadEnv(process.env.NODE_ENV || "development", process.cwd())
+
+module.exports = defineConfig({
+  projectConfig: {
+    databaseUrl: process.env.DATABASE_URL,
+    http: {
+      storeCors: process.env.STORE_CORS!,
+      adminCors: process.env.ADMIN_CORS!,
+      authCors: process.env.AUTH_CORS!,
+      jwtSecret: process.env.JWT_SECRET,
+      cookieSecret: process.env.COOKIE_SECRET,
+    },
+  },
+  modules: [
+    {
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [
+          {
+            // medusa-plugin-razorpay-v2 (SGFGOV) community provider, pinned to
+            // 0.1.4 in apps/backend/package.json. Requires real Razorpay test
+            // credentials (RAZORPAY_ID/SECRET/ACCOUNT/WEBHOOK_SECRET) to boot;
+            // without them the provider init throws "razorpay not configured".
+            // Webhook notes patch: see apps/backend/patches/razorpay-webhook-notes.md.
+            resolve: "medusa-plugin-razorpay-v2/providers/payment-razorpay/src",
+            id: "razorpay",
+            options: {
+              key_id: process.env.RAZORPAY_ID,
+              key_secret: process.env.RAZORPAY_SECRET,
+              razorpay_account: process.env.RAZORPAY_ACCOUNT,
+              webhook_secret: process.env.RAZORPAY_WEBHOOK_SECRET,
+              auto_capture: true,
+              refund_speed: "normal",
+              automatic_expiry_period: 30,
+              manual_expiry_period: 20,
+            },
+          },
+        ],
+      },
+    },
+    {
+      resolve: "@medusajs/medusa/fulfillment",
+      options: {
+        providers: [
+          {
+            // Built-in manual fulfillment provider. Shipping options created
+            // with provider_id "manual_manual" (e.g. the Standard/Express flat
+            // options seeded for India) require it to be registered here.
+            resolve: "@medusajs/medusa/fulfillment-manual",
+            id: "manual",
+          },
+          {
+            // iThink Logistics V3 fulfillment provider (todo 11). Custom module
+            // under src/modules/ithink. Requires ITHINK_BASE_URL/ACCESS_TOKEN/
+            // SECRET_KEY/PICKUP_ADDRESS_ID to reach the API; without them the
+            // provider still boots, and checkout surfaces readable errors.
+            resolve: "./src/modules/ithink",
+            id: "ithink",
+            options: {
+              base_url: process.env.ITHINK_BASE_URL,
+              access_token: process.env.ITHINK_ACCESS_TOKEN,
+              secret_key: process.env.ITHINK_SECRET_KEY,
+              pickup_address_id: process.env.ITHINK_PICKUP_ADDRESS_ID,
+              gst_number: process.env.ITHINK_GST_NUMBER,
+            },
+          },
+        ],
+      },
+    },
+  ],
+})

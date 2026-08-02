@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developers.cloudflare.com/r2/buckets/cors",
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://yourdailydrip.com",
+          "https://www.yourdailydrip.com"
+        ],
+        "methods": ["GET", "HEAD"],
+        "allowedHeaders": ["*"]
+      },
+      "exposeHeaders": [
+        "Content-Length",
+        "Content-Type",
+        "Cache-Control",
+        "ETag"
+      ],
+      "maxAgeSeconds": 3600
+    }
+  ]
+}

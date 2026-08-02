@@ -1,0 +1,5 @@
+* text=auto
+
+# Shell scripts must stay LF — they run on Linux (VPS + GitHub Actions).
+*.sh text eol=lf
+*.ps1 text eol=crlf

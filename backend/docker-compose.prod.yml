@@ -1,0 +1,98 @@
+# Production deployment for the Medusa backend (@dtc/backend, turbo monorepo).
+#
+# Topology:
+#   internet -> Caddy (80/443, TLS for api.yourdailydrip.com) -> medusa:9000 (internal only)
+#   medusa -> postgres:5432 (internal only, named volume for data)
+#
+# Only Caddy publishes host ports. Medusa's :9000 is NEVER exposed on the host.
+#
+# Required variables (set them in backend/.env - see .env.example):
+#   POSTGRES_PASSWORD, JWT_SECRET, COOKIE_SECRET, CADDY_EMAIL,
+#   RAZORPAY_ID, RAZORPAY_SECRET, RAZORPAY_ACCOUNT, RAZORPAY_WEBHOOK_SECRET
+# RAZORPAY_* are required because the razorpay provider's validateOptions
+# throws at boot without real credentials - fail fast here instead of at runtime.
+
+name: yourdailydrip-backend
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-medusa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:-medusa}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medusa} -d ${POSTGRES_DB:-medusa}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  medusa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      # Compose-network Postgres, never localhost.
+      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:?}@postgres:5432/${POSTGRES_DB:-medusa}
+      # CORS: production origin + local dev default. Add Cloudflare preview
+      # origins in backend/.env (STORE_CORS override); NEVER wildcard with
+      # credentials. Comma-separated, no spaces.
+      STORE_CORS: ${STORE_CORS:-https://yourdailydrip.com,http://localhost:5173}
+      AUTH_CORS: ${AUTH_CORS:-https://yourdailydrip.com,http://localhost:5173}
+      ADMIN_CORS: ${ADMIN_CORS:-https://api.yourdailydrip.com,http://localhost:9000}
+      JWT_SECRET: ${JWT_SECRET:?}
+      COOKIE_SECRET: ${COOKIE_SECRET:?}
+      REDIS_URL: ${REDIS_URL:-}
+      # Required - the razorpay provider will not boot without real credentials.
+      RAZORPAY_ID: ${RAZORPAY_ID:?}
+      RAZORPAY_SECRET: ${RAZORPAY_SECRET:?}
+      RAZORPAY_ACCOUNT: ${RAZORPAY_ACCOUNT:?}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:?}
+      # Optional - provider boots without these; checkout surfaces readable errors.
+      ITHINK_BASE_URL: ${ITHINK_BASE_URL:-}
+      ITHINK_ACCESS_TOKEN: ${ITHINK_ACCESS_TOKEN:-}
+      ITHINK_SECRET_KEY: ${ITHINK_SECRET_KEY:-}
+      ITHINK_PICKUP_ADDRESS_ID: ${ITHINK_PICKUP_ADDRESS_ID:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Internal only: reachable by Caddy on the compose network, never published.
+    expose:
+      - "9000"
+    # /health is the liveness probe (returns 200 even while Postgres is down).
+    # /admin/ready is the DB-readiness probe (503 in ~3s when Postgres is down);
+    # see DEPLOYMENT.md before scripting against it.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:9000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # ACME account email for TLS certificates (Let's Encrypt notices).
+      CADDY_EMAIL: ${CADDY_EMAIL:?}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      medusa:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  caddy-data:
+  caddy-config:

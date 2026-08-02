@@ -1,0 +1,39 @@
+# --- Secrets / local env (never commit) ---
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+
+# --- Dependencies ---
+node_modules
+
+# --- Build output (backend turbo + storefront nitro) ---
+dist
+dist-ssr
+.output
+.nitro
+.vinxi
+.tanstack/**
+.wrangler/
+.medusa
+.turbo
+coverage
+
+# --- Agent / tooling working dirs (local only) ---
+.omo/
+.playwright-mcp/
+.lovable/
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# --- Editor / OS ---
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db

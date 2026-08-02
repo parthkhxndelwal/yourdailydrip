@@ -1,0 +1,166 @@
+- generic [active] [ref=f5e1]:
+  - generic [ref=f5e3]:
+    - generic [ref=f5e4]:
+      - generic [ref=f5e5]: ✦
+      - text: Shipping rates calculated at checkout from your pincode
+    - generic [ref=f5e6]:
+      - generic [ref=f5e7]: ✦
+      - text: FLAT 20% off your first order — code DRIP20
+    - generic [ref=f5e8]:
+      - generic [ref=f5e9]: ✦
+      - text: Buy any 2 hair care products, get a scalp massager free
+    - generic [ref=f5e10]:
+      - generic [ref=f5e11]: ✦
+      - text: Dermatologist tested · Cruelty free · Made in India
+    - generic [ref=f5e12]:
+      - generic [ref=f5e13]: ✦
+      - text: Same-day dispatch on orders placed before 4 PM
+    - generic [ref=f5e14]:
+      - generic [ref=f5e15]: ✦
+      - text: Shipping rates calculated at checkout from your pincode
+    - generic [ref=f5e16]:
+      - generic [ref=f5e17]: ✦
+      - text: FLAT 20% off your first order — code DRIP20
+    - generic [ref=f5e18]:
+      - generic [ref=f5e19]: ✦
+      - text: Buy any 2 hair care products, get a scalp massager free
+    - generic [ref=f5e20]:
+      - generic [ref=f5e21]: ✦
+      - text: Dermatologist tested · Cruelty free · Made in India
+    - generic [ref=f5e22]:
+      - generic [ref=f5e23]: ✦
+      - text: Same-day dispatch on orders placed before 4 PM
+  - banner [ref=f5e24]:
+    - generic [ref=f5e25]:
+      - link "DailyDrip" [ref=f5e26] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=f5e27]:
+        - button "Shop" [ref=f5e28]
+        - link "Hair Care" [ref=f5e31] [cursor=pointer]:
+          - /url: /hair-care
+        - link "Skin Care" [ref=f5e32] [cursor=pointer]:
+          - /url: /skin-care
+        - link "Track Order" [ref=f5e33] [cursor=pointer]:
+          - /url: /track-order
+      - generic [ref=f5e38]:
+        - button "Search" [ref=f5e39] [cursor=pointer]
+        - link "Wishlist" [ref=f5e40] [cursor=pointer]:
+          - /url: /wishlist
+          - generic [ref=f5e114]: "1"
+        - link "Cart" [ref=f5e41] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=f5e115]: "2"
+        - link "Account" [ref=f5e42] [cursor=pointer]:
+          - /url: /account
+  - main [ref=f5e43]:
+    - generic [ref=f5e44]:
+      - heading "Checkout" [level=1] [ref=f5e45]
+      - generic [ref=f5e116]:
+        - generic [ref=f5e117]:
+          - list [ref=f5e118]:
+            - listitem [ref=f5e119]:
+              - generic [ref=f5e121]: Address
+            - listitem [ref=f5e123]:
+              - generic [ref=f5e124]: "2"
+              - generic [ref=f5e125]: Payment
+          - generic [ref=f5e180]:
+            - heading "Payment & review" [level=2] [ref=f5e181]
+            - generic [ref=f5e182]:
+              - generic [ref=f5e183]:
+                - term [ref=f5e184]: Email
+                - definition [ref=f5e185]: qa.test.user@dailydrip.in
+              - generic [ref=f5e186]:
+                - term [ref=f5e187]: Ship to
+                - definition [ref=f5e188]: QA Tester, 42 MG Road, Bengaluru, Karnataka, 560001
+              - generic [ref=f5e189]:
+                - term [ref=f5e190]: Shipping
+                - definition [ref=f5e191]: Standard Shipping
+              - generic [ref=f5e192]:
+                - term [ref=f5e193]: Amount to pay
+                - definition [ref=f5e194]: ₹1,247
+            - paragraph [ref=f5e195]: You'll pay securely through Razorpay. Your order is confirmed by the store after payment — a successful payment alone isn't final until we confirm it.
+            - generic [ref=f5e196]:
+              - button "Back" [ref=f5e197] [cursor=pointer]
+              - button "Pay ₹1,247" [ref=f5e198] [cursor=pointer]
+        - complementary [ref=f5e159]:
+          - heading "Order summary" [level=2] [ref=f5e160]
+          - list [ref=f5e161]:
+            - listitem [ref=f5e162]:
+              - generic [ref=f5e163]: Rooted Hair Growth Oil × 1
+              - generic [ref=f5e164]: ₹649
+            - listitem [ref=f5e165]:
+              - generic [ref=f5e166]: Everyday Gentle Shampoo × 1
+              - generic [ref=f5e167]: ₹549
+          - generic [ref=f5e168]:
+            - generic [ref=f5e169]:
+              - term [ref=f5e170]: Subtotal
+              - definition [ref=f5e171]: ₹1,198
+            - generic [ref=f5e172]:
+              - term [ref=f5e173]: Shipping
+              - definition [ref=f5e174]: ₹49
+            - generic [ref=f5e175]:
+              - term [ref=f5e176]: Total
+              - definition [ref=f5e177]: ₹1,247
+  - contentinfo [ref=f5e50]:
+    - generic [ref=f5e51]:
+      - generic [ref=f5e52]:
+        - paragraph [ref=f5e53]: DailyDrip
+        - paragraph [ref=f5e54]: Clean, dermatologist-tested skin and hair care made in India. Honest formulas, full ingredient lists, no empty promises.
+        - generic [ref=f5e55]:
+          - link "Instagram" [ref=f5e56] [cursor=pointer]:
+            - /url: https://instagram.com/dailydrip
+          - link "Facebook" [ref=f5e60] [cursor=pointer]:
+            - /url: https://facebook.com/dailydrip
+          - link "YouTube" [ref=f5e63] [cursor=pointer]:
+            - /url: https://youtube.com/@dailydrip
+          - link "X (Twitter)" [ref=f5e67] [cursor=pointer]:
+            - /url: https://x.com/dailydrip
+          - link "LinkedIn" [ref=f5e70] [cursor=pointer]:
+            - /url: https://linkedin.com/company/dailydrip
+      - generic [ref=f5e75]:
+        - heading "Company" [level=3] [ref=f5e76]
+        - list [ref=f5e77]:
+          - listitem [ref=f5e78]:
+            - link "About Us" [ref=f5e79] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=f5e80]:
+            - link "Our Story / Our Values" [ref=f5e81] [cursor=pointer]:
+              - /url: /our-story
+          - listitem [ref=f5e82]:
+            - link "Blogs" [ref=f5e83] [cursor=pointer]:
+              - /url: /blogs
+          - listitem [ref=f5e84]:
+            - link "How to Use" [ref=f5e85] [cursor=pointer]:
+              - /url: /how-to-use
+      - generic [ref=f5e86]:
+        - heading "Support" [level=3] [ref=f5e87]
+        - list [ref=f5e88]:
+          - listitem [ref=f5e89]:
+            - link "Track Order" [ref=f5e90] [cursor=pointer]:
+              - /url: /track-order
+          - listitem [ref=f5e91]:
+            - link "Shipping Policy" [ref=f5e92] [cursor=pointer]:
+              - /url: /shipping-policy
+          - listitem [ref=f5e93]:
+            - link "Return & Refund Policy" [ref=f5e94] [cursor=pointer]:
+              - /url: /returns
+          - listitem [ref=f5e95]:
+            - link "Privacy Notice" [ref=f5e96] [cursor=pointer]:
+              - /url: /privacy
+      - generic [ref=f5e97]:
+        - heading "Reach us" [level=3] [ref=f5e98]
+        - list [ref=f5e99]:
+          - listitem [ref=f5e100]: Daily Drip Wellness Pvt. Ltd.
+          - listitem [ref=f5e101]: 4th Floor, Prestige Atrium, Bengaluru 560001
+          - listitem [ref=f5e102]:
+            - link "care@dailydrip.in" [ref=f5e103] [cursor=pointer]:
+              - /url: mailto:care@dailydrip.in
+          - listitem [ref=f5e104]:
+            - link "+91 80001 12233" [ref=f5e105] [cursor=pointer]:
+              - /url: tel:+918000112233
+          - listitem [ref=f5e106]: Mon–Sat, 9 AM – 7 PM IST
+    - generic [ref=f5e108]:
+      - paragraph [ref=f5e109]: © 2026 Daily Drip Wellness Pvt. Ltd. All rights reserved.
+      - paragraph [ref=f5e110]: GSTIN 29AABCD1234E1Z5 · CIN U24246KA2021PTC123456
+  - button "Chat with us" [ref=f5e111]: Chat
+  - region "Notifications alt+T"

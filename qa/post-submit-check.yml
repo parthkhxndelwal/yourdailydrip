@@ -1,0 +1,276 @@
+- generic [ref=f22e1]:
+  - generic [ref=f22e3]:
+    - generic [ref=f22e4]:
+      - generic [ref=f22e5]: ✦
+      - text: Shipping rates calculated at checkout from your pincode
+    - generic [ref=f22e6]:
+      - generic [ref=f22e7]: ✦
+      - text: FLAT 20% off your first order — code DRIP20
+    - generic [ref=f22e8]:
+      - generic [ref=f22e9]: ✦
+      - text: Buy any 2 hair care products, get a scalp massager free
+    - generic [ref=f22e10]:
+      - generic [ref=f22e11]: ✦
+      - text: Dermatologist tested · Cruelty free · Made in India
+    - generic [ref=f22e12]:
+      - generic [ref=f22e13]: ✦
+      - text: Same-day dispatch on orders placed before 4 PM
+    - generic [ref=f22e14]:
+      - generic [ref=f22e15]: ✦
+      - text: Shipping rates calculated at checkout from your pincode
+    - generic [ref=f22e16]:
+      - generic [ref=f22e17]: ✦
+      - text: FLAT 20% off your first order — code DRIP20
+    - generic [ref=f22e18]:
+      - generic [ref=f22e19]: ✦
+      - text: Buy any 2 hair care products, get a scalp massager free
+    - generic [ref=f22e20]:
+      - generic [ref=f22e21]: ✦
+      - text: Dermatologist tested · Cruelty free · Made in India
+    - generic [ref=f22e22]:
+      - generic [ref=f22e23]: ✦
+      - text: Same-day dispatch on orders placed before 4 PM
+  - banner [ref=f22e24]:
+    - generic [ref=f22e25]:
+      - link "DailyDrip" [ref=f22e26] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=f22e27]:
+        - button "Shop" [ref=f22e28]
+        - link "Hair Care" [ref=f22e31] [cursor=pointer]:
+          - /url: /hair-care
+        - link "Skin Care" [ref=f22e32] [cursor=pointer]:
+          - /url: /skin-care
+        - link "Track Order" [ref=f22e33] [cursor=pointer]:
+          - /url: /track-order
+      - generic [ref=f22e38]:
+        - button "Search" [ref=f22e39] [cursor=pointer]
+        - link "Wishlist" [ref=f22e40] [cursor=pointer]:
+          - /url: /wishlist
+          - generic [ref=f22e114]: "1"
+        - link "Cart" [ref=f22e41] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=f22e115]: "2"
+        - link "Account" [ref=f22e42] [cursor=pointer]:
+          - /url: /account
+  - main [ref=f22e43]:
+    - generic [ref=f22e44]:
+      - heading "Checkout" [level=1] [ref=f22e45]
+      - generic [ref=f22e116]:
+        - generic [ref=f22e117]:
+          - list [ref=f22e118]:
+            - listitem [ref=f22e119]:
+              - generic [ref=f22e123]: Address
+            - listitem [ref=f22e125]:
+              - generic [ref=f22e126]: "2"
+              - generic [ref=f22e127]: Payment
+          - generic [ref=f22e128]:
+            - heading "Payment & review" [level=2] [ref=f22e129]
+            - generic [ref=f22e130]:
+              - generic [ref=f22e131]:
+                - term [ref=f22e132]: Email
+                - definition [ref=f22e133]: qa.test.user@dailydrip.in
+              - generic [ref=f22e134]:
+                - term [ref=f22e135]: Ship to
+                - definition [ref=f22e136]: QA Tester, 42 MG Road, Bengaluru, Karnataka, 560001
+              - generic [ref=f22e137]:
+                - term [ref=f22e138]: Shipping
+                - definition [ref=f22e139]: Standard Shipping
+              - generic [ref=f22e140]:
+                - term [ref=f22e141]: Amount to pay
+                - definition [ref=f22e142]: ₹1,247
+            - paragraph [ref=f22e143]: You'll pay securely through Razorpay. Your order is confirmed by the store after payment — a successful payment alone isn't final until we confirm it.
+            - generic [ref=f22e144]:
+              - button "Back" [disabled]
+              - button "Opening Razorpay…" [disabled]
+        - complementary [ref=f22e147]:
+          - heading "Order summary" [level=2] [ref=f22e148]
+          - list [ref=f22e149]:
+            - listitem [ref=f22e150]:
+              - generic [ref=f22e151]: Rooted Hair Growth Oil × 1
+              - generic [ref=f22e152]: ₹649
+            - listitem [ref=f22e153]:
+              - generic [ref=f22e154]: Everyday Gentle Shampoo × 1
+              - generic [ref=f22e155]: ₹549
+          - generic [ref=f22e156]:
+            - generic [ref=f22e157]:
+              - term [ref=f22e158]: Subtotal
+              - definition [ref=f22e159]: ₹1,198
+            - generic [ref=f22e160]:
+              - term [ref=f22e161]: Shipping
+              - definition [ref=f22e162]: ₹49
+            - generic [ref=f22e163]:
+              - term [ref=f22e164]: Total
+              - definition [ref=f22e165]: ₹1,247
+  - contentinfo [ref=f22e50]:
+    - generic [ref=f22e51]:
+      - generic [ref=f22e52]:
+        - paragraph [ref=f22e53]: DailyDrip
+        - paragraph [ref=f22e54]: Clean, dermatologist-tested skin and hair care made in India. Honest formulas, full ingredient lists, no empty promises.
+        - generic [ref=f22e55]:
+          - link "Instagram" [ref=f22e56] [cursor=pointer]:
+            - /url: https://instagram.com/dailydrip
+          - link "Facebook" [ref=f22e60] [cursor=pointer]:
+            - /url: https://facebook.com/dailydrip
+          - link "YouTube" [ref=f22e63] [cursor=pointer]:
+            - /url: https://youtube.com/@dailydrip
+          - link "X (Twitter)" [ref=f22e67] [cursor=pointer]:
+            - /url: https://x.com/dailydrip
+          - link "LinkedIn" [ref=f22e70] [cursor=pointer]:
+            - /url: https://linkedin.com/company/dailydrip
+      - generic [ref=f22e75]:
+        - heading "Company" [level=3] [ref=f22e76]
+        - list [ref=f22e77]:
+          - listitem [ref=f22e78]:
+            - link "About Us" [ref=f22e79] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=f22e80]:
+            - link "Our Story / Our Values" [ref=f22e81] [cursor=pointer]:
+              - /url: /our-story
+          - listitem [ref=f22e82]:
+            - link "Blogs" [ref=f22e83] [cursor=pointer]:
+              - /url: /blogs
+          - listitem [ref=f22e84]:
+            - link "How to Use" [ref=f22e85] [cursor=pointer]:
+              - /url: /how-to-use
+      - generic [ref=f22e86]:
+        - heading "Support" [level=3] [ref=f22e87]
+        - list [ref=f22e88]:
+          - listitem [ref=f22e89]:
+            - link "Track Order" [ref=f22e90] [cursor=pointer]:
+              - /url: /track-order
+          - listitem [ref=f22e91]:
+            - link "Shipping Policy" [ref=f22e92] [cursor=pointer]:
+              - /url: /shipping-policy
+          - listitem [ref=f22e93]:
+            - link "Return & Refund Policy" [ref=f22e94] [cursor=pointer]:
+              - /url: /returns
+          - listitem [ref=f22e95]:
+            - link "Privacy Notice" [ref=f22e96] [cursor=pointer]:
+              - /url: /privacy
+      - generic [ref=f22e97]:
+        - heading "Reach us" [level=3] [ref=f22e98]
+        - list [ref=f22e99]:
+          - listitem [ref=f22e100]: Daily Drip Wellness Pvt. Ltd.
+          - listitem [ref=f22e101]: 4th Floor, Prestige Atrium, Bengaluru 560001
+          - listitem [ref=f22e102]:
+            - link "care@dailydrip.in" [ref=f22e103] [cursor=pointer]:
+              - /url: mailto:care@dailydrip.in
+          - listitem [ref=f22e104]:
+            - link "+91 80001 12233" [ref=f22e105] [cursor=pointer]:
+              - /url: tel:+918000112233
+          - listitem [ref=f22e106]: Mon–Sat, 9 AM – 7 PM IST
+    - generic [ref=f22e108]:
+      - paragraph [ref=f22e109]: © 2026 Daily Drip Wellness Pvt. Ltd. All rights reserved.
+      - paragraph [ref=f22e110]: GSTIN 29AABCD1234E1Z5 · CIN U24246KA2021PTC123456
+  - button "Chat with us" [ref=f22e111]: Chat
+  - region "Notifications alt+T"
+  - generic [ref=f22e166]:
+    - generic [ref=f22e167]: Test Mode
+    - iframe [ref=f22e171]:
+      - generic [ref=f36e2]:
+        - generic [ref=f36e3]:
+          - generic [ref=f36e4]:
+            - generic [ref=f36e7]:
+              - generic [ref=f36e8]: D
+              - generic "Daily Drip" [ref=f36e10]
+            - generic [ref=f36e12]:
+              - generic [ref=f36e13]:
+                - generic [ref=f36e17]:
+                  - generic [ref=f36e18]: Price Summary
+                  - heading "₹ 0 1 2 3 4 5 6 7 8 9 0 , 0 1 2 3 4 5 6 7 8 9 0 0 1 2 3 4 5 6 7 8 9 0 0 1 2 3 4 5 6 7 8 9 0" [level=3] [ref=f36e22]:
+                    - generic [ref=f36e23]: ₹
+                    - generic [ref=f36e24]:
+                      - generic [ref=f36e25]: "0"
+                      - generic [ref=f36e26]: "1"
+                      - generic [ref=f36e27]: "2"
+                      - generic [ref=f36e28]: "3"
+                      - generic [ref=f36e29]: "4"
+                      - generic [ref=f36e30]: "5"
+                      - generic [ref=f36e31]: "6"
+                      - generic [ref=f36e32]: "7"
+                      - generic [ref=f36e33]: "8"
+                      - generic [ref=f36e34]: "9"
+                      - generic [ref=f36e35]: "0"
+                    - generic [ref=f36e36]: ","
+                    - generic [ref=f36e37]:
+                      - generic [ref=f36e38]: "0"
+                      - generic [ref=f36e39]: "1"
+                      - generic [ref=f36e40]: "2"
+                      - generic [ref=f36e41]: "3"
+                      - generic [ref=f36e42]: "4"
+                      - generic [ref=f36e43]: "5"
+                      - generic [ref=f36e44]: "6"
+                      - generic [ref=f36e45]: "7"
+                      - generic [ref=f36e46]: "8"
+                      - generic [ref=f36e47]: "9"
+                      - generic [ref=f36e48]: "0"
+                    - generic [ref=f36e49]:
+                      - generic [ref=f36e50]: "0"
+                      - generic [ref=f36e51]: "1"
+                      - generic [ref=f36e52]: "2"
+                      - generic [ref=f36e53]: "3"
+                      - generic [ref=f36e54]: "4"
+                      - generic [ref=f36e55]: "5"
+                      - generic [ref=f36e56]: "6"
+                      - generic [ref=f36e57]: "7"
+                      - generic [ref=f36e58]: "8"
+                      - generic [ref=f36e59]: "9"
+                      - generic [ref=f36e60]: "0"
+                    - generic [ref=f36e61]:
+                      - generic [ref=f36e62]: "0"
+                      - generic [ref=f36e63]: "1"
+                      - generic [ref=f36e64]: "2"
+                      - generic [ref=f36e65]: "3"
+                      - generic [ref=f36e66]: "4"
+                      - generic [ref=f36e67]: "5"
+                      - generic [ref=f36e68]: "6"
+                      - generic [ref=f36e69]: "7"
+                      - generic [ref=f36e70]: "8"
+                      - generic [ref=f36e71]: "9"
+                      - generic [ref=f36e72]: "0"
+                - button "Using as +91 93556 30199" [ref=f36e73] [cursor=pointer]
+              - generic [ref=f36e82]:
+                - generic [ref=f36e83]: Secured by
+                - generic "RazorPay" [ref=f36e84]
+          - generic [ref=f36e88]:
+            - generic [ref=f36e89]:
+              - button "Go back" [ref=f36e91] [cursor=pointer]
+              - generic [ref=f36e95]: Payment Options
+              - generic [ref=f36e96]:
+                - button "Show more options" [ref=f36e97] [cursor=pointer]
+                - button "Close Checkout" [ref=f36e101] [cursor=pointer]
+            - separator [ref=f36e105]
+            - generic [ref=f36e112]:
+              - paragraph [ref=f36e113]: Cardless and Others EMI
+              - generic [ref=f36e114]:
+                - generic [ref=f36e115] [cursor=pointer]:
+                  - radio "instant_emi Instant EMI" [checked]
+                  - generic [ref=f36e117]:
+                    - img "instant_emi" [ref=f36e118]
+                    - paragraph [ref=f36e120]: Instant EMI
+                - generic [ref=f36e124] [cursor=pointer]:
+                  - radio "walnut369 axio"
+                  - generic [ref=f36e126]:
+                    - img "walnut369" [ref=f36e127]
+                    - paragraph [ref=f36e129]: axio
+                - generic [ref=f36e133] [cursor=pointer]:
+                  - radio "snapmint Snapmint 0% EMIs on UPI & Cards"
+                  - generic [ref=f36e135]:
+                    - img "snapmint" [ref=f36e136]
+                    - generic [ref=f36e137]:
+                      - paragraph [ref=f36e138]: Snapmint
+                      - paragraph [ref=f36e139]: 0% EMIs on UPI & Cards
+                - generic [ref=f36e143] [cursor=pointer]:
+                  - radio "zestmoney ZestMoney"
+                  - generic [ref=f36e145]:
+                    - img "zestmoney" [ref=f36e146]
+                    - paragraph [ref=f36e148]: ZestMoney
+        - generic [ref=f36e157]:
+          - generic [ref=f36e158]:
+            - paragraph
+            - paragraph
+            - heading "Confirming Payment" [level=3] [ref=f36e193]
+            - paragraph [ref=f36e161]: This will only take a few seconds.
+          - generic [ref=f36e195]:
+            - generic [ref=f36e196]: Secured by
+            - generic "RazorPay" [ref=f36e197]

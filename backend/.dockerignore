@@ -1,0 +1,25 @@
+# Dependencies - never let host (Windows) node_modules leak into a Linux image.
+node_modules
+**/node_modules
+
+# Build output and caches (regenerated inside the image).
+.turbo
+**/.turbo
+**/.medusa
+**/dist
+**/build
+coverage
+
+# Secrets - keep local env files out of the build context and image.
+**/.env
+**/.env.local
+**/.env.*.local
+**/.env.production
+**/.env.development
+
+# VCS and misc
+.git
+.gitignore
+npm-debug.log*
+*.pem
+.DS_Store

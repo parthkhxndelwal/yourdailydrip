@@ -1,0 +1,20 @@
+# Caddy configuration for the Daily Drip Medusa backend (todo 16).
+# TLS (Let's Encrypt) is automatic for api.yourdailydrip.com; the ACME account
+# email comes from the CADDY_EMAIL env var set in docker-compose.prod.yml.
+
+{
+	email {$CADDY_EMAIL}
+}
+
+api.yourdailydrip.com {
+	reverse_proxy medusa:9000
+
+	# Compress API responses (Store API + admin are JSON-heavy).
+	encode zstd gzip
+
+	# Cap request bodies - the largest legit payloads are Razorpay webhooks
+	# (a few KB); reject anything oversized early instead of proxying it.
+	request_body {
+		max_size 2MB
+	}
+}

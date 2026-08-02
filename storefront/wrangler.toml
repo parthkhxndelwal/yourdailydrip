@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json
+# =============================================================================
+# Cloudflare Workers configuration for yourdailydrip storefront.
+#
+# The Nitro build (via @tanstack/react-start + cloudflare-module preset)
+# generates the actual deployment config in .output/server/wrangler.json.
+# This file serves as the source of truth for user-modifiable settings
+# that Nitro merges into its generated config during build.
+#
+# DO NOT set `main` or `assets` here — Nitro controls those and will
+# emit a warning if they appear in this file. They are auto-configured
+# in .output/server/wrangler.json during the build step.
+#
+# Deploy workflow:
+#   1. bun run build          ← builds to .output/ (Nitro cloudflare-module)
+#   2. npx wrangler deploy    ← uses .wrangler/deploy/config.json
+#   (the package.json "deploy:workers" script runs both in sequence)
+#
+# Workers secrets (set once, never committed) — public runtime config for SSR:
+#   npx wrangler secret put MEDUSA_BACKEND_URL        --name yourdailydrip-storefront
+#   npx wrangler secret put MEDUSA_PUBLISHABLE_KEY    --name yourdailydrip-storefront
+#   npx wrangler secret put RAZORPAY_KEY_ID           --name yourdailydrip-storefront
+# or run ./scripts/setup-secrets.sh (bash) / .\scripts\setup-secrets.ps1 (PowerShell)
+#
+# These three are PUBLIC config, not backend secrets: the Worker's SSR runtime
+# reads MEDUSA_BACKEND_URL / MEDUSA_PUBLISHABLE_KEY from env (bridged into
+# process.env by src/server.ts), while the browser bundle receives the same
+# values baked in at BUILD time as VITE_* (VITE_MEDUSA_BACKEND_URL,
+# VITE_MEDUSA_PUBLISHABLE_KEY, VITE_RAZORPAY_KEY_ID).
+#
+# Backend-only secrets — RAZORPAY_SECRET, RAZORPAY_WEBHOOK_SECRET, DATABASE_URL,
+# JWT_SECRET, COOKIE_SECRET, ITHINK_* — live on the Medusa VPS and must NEVER be
+# set as Workers secrets, listed in [vars], or placed in any client bundle.
+# =============================================================================
+
+name = "yourdailydrip-storefront"
+compatibility_date = "2026-07-30"
+compatibility_flags = ["nodejs_compat"]
+
+# Routes — uncomment and customize when deploying to a custom domain:
+# routes = [
+#   { pattern = "yourdailydrip.com", zone_id = "<ZONE_ID>" },
+# ]
+
+# R2 bucket for static assets (product images, blog media, build outputs)
+[[r2_buckets]]
+binding = "STATIC_ASSETS"
+bucket_name = "yourdailydrip-static"
