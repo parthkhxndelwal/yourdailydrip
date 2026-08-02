@@ -10,6 +10,7 @@ on:
     paths:
       - "storefront/**"
       - ".github/workflows/deploy-storefront.yml"
+  workflow_dispatch:
 
 concurrency:
   group: deploy-storefront
