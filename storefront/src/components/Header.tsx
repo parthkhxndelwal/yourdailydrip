@@ -101,8 +101,8 @@ export function Header() {
           </SheetContent>
         </Sheet>
 
-        <Link to="/" className="font-display text-xl leading-none tracking-tight">
-          Daily<span className="text-leaf">Drip</span>
+        <Link to="/" className="flex shrink-0 items-center" aria-label="Daily Drip home">
+          <img src="/dailydrip_logo.png" alt="Daily Drip" className="h-10 w-auto" />
         </Link>
 
         <nav className="ml-6 hidden items-center gap-6 lg:flex">
