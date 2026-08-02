@@ -24,7 +24,7 @@ import type { Product, Review } from "./products";
 
 // ── Constants ───────────────────────────────────────────────────────────────
 
-export const REGION_ID = "reg_01KYX2XKRTB1WDSDXV5J3V8BX7";
+export const REGION_ID = "reg_01KZ1FDN3K5N681SNXFQNA5NM5";
 
 const PRODUCT_FIELDS =
   "id,title,handle,subtitle,description,thumbnail,metadata,*categories,images.*,*variants,variants.calculated_price,variants.inventory_quantity";
