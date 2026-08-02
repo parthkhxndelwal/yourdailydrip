@@ -1,0 +1,42 @@
+name: Deploy Storefront (Cloudflare Workers)
+
+# Runs on every push to main (i.e. every merged PR), scoped to storefront changes.
+# Builds with bun + Nitro and deploys the Workers service (yourdailydrip-storefront).
+# Skips (job is skipped, not failed) until CLOUDFLARE_API_TOKEN is set in repo secrets.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "storefront/**"
+      - ".github/workflows/deploy-storefront.yml"
+
+concurrency:
+  group: deploy-storefront
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: storefront
+        run: bun install --frozen-lockfile
+
+      - name: Build (Nitro cloudflare-module)
+        working-directory: storefront
+        run: bun run build
+
+      - name: Deploy to Cloudflare Workers
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        working-directory: storefront
+        run: npx wrangler deploy

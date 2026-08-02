@@ -1,0 +1,55 @@
+name: Deploy Backend (VPS)
+
+# Runs on every push to main (i.e. every merged PR), scoped to backend changes.
+# Deploys the Medusa backend to the VPS at ~/yourdailydrip via SSH:
+#   git pull -> docker compose up -d --build
+# db:migrate is intentionally NOT run here - it is a manual step (see DEPLOYMENT.md).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend.yml"
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: "30m"
+          script: |
+            set -e
+            cd ~/yourdailydrip
+            echo "== git pull =="
+            git pull --ff-only origin main
+            echo "== docker compose up -d --build =="
+            cd backend
+            docker compose -f docker-compose.prod.yml up -d --build
+            echo "== container status =="
+            docker compose -f docker-compose.prod.yml ps
+            echo "== waiting for medusa healthcheck (up to 5 min) =="
+            healthy=0
+            for i in $(seq 1 30); do
+              status=$(docker compose -f docker-compose.prod.yml ps --format json medusa 2>/dev/null | grep -o '"Health":"[^"]*"' | head -1 | cut -d'"' -f4)
+              if [ "$status" = "healthy" ]; then
+                echo "medusa healthy after ${i}0s"
+                healthy=1
+                break
+              fi
+              sleep 10
+            done
+            if [ "$healthy" != "1" ]; then
+              echo "WARNING: medusa not healthy within 5 min."
+              echo "Check backend/.env on the VPS - RAZORPAY_* and CADDY_EMAIL are required to boot."
+              docker compose -f docker-compose.prod.yml logs --tail=30 medusa || true
+            fi

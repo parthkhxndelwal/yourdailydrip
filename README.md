@@ -50,7 +50,7 @@ docker compose -f docker-compose.prod.yml exec -T medusa npx medusa db:migrate
 | `VPS_HOST` | backend | VPS IP (`80.225.196.254`) |
 | `VPS_USER` | backend | SSH user (`opc`) |
 | `VPS_SSH_KEY` | backend | dedicated deploy key (private key; pubkey is in the VPS `authorized_keys`) |
-| `CLOUDFLARE_API_TOKEN` | storefront | Cloudflare dashboard → My Profile → API Tokens (edit Workers + R2; until set, the storefront job skips) |
+| `CLOUDFLARE_API_TOKEN` | storefront | Cloudflare dashboard → My Profile → API Tokens (edit Workers + R2; until set, the storefront deploy step skips) |
 | `CLOUDFLARE_ACCOUNT_ID` | storefront | Cloudflare dashboard → right sidebar (account ID) |
 
 ### First-run on the VPS (one-time, manual)
