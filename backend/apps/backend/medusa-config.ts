@@ -15,6 +15,33 @@ module.exports = defineConfig({
   },
   modules: [
     {
+      resolve: "@medusajs/medusa/file",
+      options: {
+        providers: [
+          {
+            // Cloudflare R2 (S3-compatible) file storage for product image
+            // uploads from the admin dashboard (POST /admin/uploads). R2 is
+            // BucketOwnerEnforced, so acl MUST be false (no ACL headers or the
+            // SDK fails). Requires real R2 API-token credentials (S3_*) in
+            // backend/.env; the provider throws at boot without them - fail
+            // fast here instead of surfacing upload errors later.
+            resolve: "@medusajs/medusa/file-s3",
+            id: "s3",
+            options: {
+              file_url: process.env.S3_FILE_URL!,
+              access_key_id: process.env.S3_ACCESS_KEY_ID,
+              secret_access_key: process.env.S3_SECRET_ACCESS_KEY,
+              region: process.env.S3_REGION,
+              bucket: process.env.S3_BUCKET,
+              prefix: process.env.S3_PREFIX,
+              endpoint: process.env.S3_ENDPOINT,
+              acl: false,
+            },
+          },
+        ],
+      },
+    },
+    {
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [

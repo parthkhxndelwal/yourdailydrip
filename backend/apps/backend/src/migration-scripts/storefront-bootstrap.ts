@@ -83,7 +83,7 @@ const INDIA_WAREHOUSE_ADDRESS = {
   city: "Mumbai",
   country_code: "IN",
   province: "maharashtra",
-  postal_code: "110006",
+  postal_code: "400001",
 }
 
 // Rooted Hair Growth Oil — transcribed 1:1 from storefront/src/lib/products.ts
