@@ -96,5 +96,11 @@ module.exports = defineConfig({
         ],
       },
     },
+    {
+      // Preorder module: preorder_variant / preorder data models + links to
+      // product_variant and order (read-only). Migration: npx medusa
+      // db:generate preorder, then npx medusa db:migrate.
+      resolve: "./src/modules/preorder",
+    },
   ],
 })
