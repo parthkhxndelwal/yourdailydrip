@@ -11,7 +11,7 @@ function makeArgs(container: Record<string, unknown>): SubscriberArgs<{ id: stri
   }
 }
 
-function makeContainer(orderData: OrderData[]) {
+function makeContainer(orderData: OrderData[], preorderVariants: unknown[] = []) {
   const deps = {
     logger: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
     query: {
@@ -20,6 +20,9 @@ function makeContainer(orderData: OrderData[]) {
     createOrderFulfillmentWorkflow: jest
       .fn()
       .mockReturnValue({ run: jest.fn().mockResolvedValue({ result: { id: "ful_1" } }) }),
+    preorder: {
+      listPreorderVariants: jest.fn().mockResolvedValue(preorderVariants),
+    },
   }
   const container = {
     resolve: (key: string): unknown => deps[key as keyof typeof deps],
@@ -49,6 +52,7 @@ describe("order.placed subscriber (iThink registration)", () => {
         "fulfillments.id",
         "items.id",
         "items.quantity",
+        "items.variant_id",
       ],
       filters: { id: "order_1" },
     })
@@ -130,5 +134,29 @@ describe("order.placed subscriber (iThink registration)", () => {
 
     expect(deps.createOrderFulfillmentWorkflow).not.toHaveBeenCalled()
     expect(deps.logger.warn).toHaveBeenCalledWith(expect.stringContaining("not found"))
+  })
+
+  it("skips iThink registration when the order contains a pre-order variant", async () => {
+    const { deps, container } = makeContainer(
+      [
+        {
+          payment_collections: [{ status: "captured" }],
+          fulfillments: [],
+          items: [{ id: "orli_1", quantity: 1, variant_id: "variant_1" }],
+        },
+      ],
+      [{ id: "pov_1", variant_id: "variant_1", status: "enabled" }]
+    )
+
+    await registerOrderWithIthinkHandler(makeArgs(container))
+
+    expect(deps.preorder.listPreorderVariants).toHaveBeenCalledWith({
+      variant_id: ["variant_1"],
+      status: "enabled",
+    })
+    expect(deps.createOrderFulfillmentWorkflow).not.toHaveBeenCalled()
+    expect(deps.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("pre-order order order_1")
+    )
   })
 })
