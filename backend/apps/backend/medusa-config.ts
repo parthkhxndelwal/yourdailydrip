@@ -102,5 +102,38 @@ module.exports = defineConfig({
       // db:generate preorder, then npx medusa db:migrate.
       resolve: "./src/modules/preorder",
     },
+    {
+      // Notification module: exactly ONE email provider per boot. Medusa
+      // routes sends by channel and throws if multiple providers claim the
+      // same channel, so RESEND_API_KEY decides: set -> hand-rolled resend
+      // provider (src/modules/resend, raw HTML templates from code - no
+      // dashboard template IDs), unset -> local provider that logs instead
+      // of sending (dev). options.cloud is intentionally NOT set - it would
+      // auto-register Medusa Cloud Email as a third email provider.
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: process.env.RESEND_API_KEY
+          ? [
+              {
+                resolve: "./src/modules/resend",
+                id: "resend",
+                options: {
+                  channels: ["email"],
+                  api_key: process.env.RESEND_API_KEY,
+                  from: process.env.RESEND_FROM_EMAIL,
+                },
+              },
+            ]
+          : [
+              {
+                resolve: "@medusajs/medusa/notification-local",
+                id: "local",
+                options: {
+                  channels: ["email"],
+                },
+              },
+            ],
+      },
+    },
   ],
 })
