@@ -133,6 +133,26 @@ describe("GET /store/announcement", () => {
     expect(res.body).toEqual({ text: null, ends_at: null, show_countdown: true, link: null })
   })
 
+  it("treats an empty ends_at as no countdown without invalidating the config", async () => {
+    const { module } = storeModule({
+      announcement_bar: {
+        text: "Flat 15% off this weekend",
+        ends_at: "",
+      },
+    })
+    const res = fakeResponse()
+
+    await GET(fakeRequest(module), res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toEqual({
+      text: "Flat 15% off this weekend",
+      ends_at: null,
+      show_countdown: true,
+      link: null,
+    })
+  })
+
   it("returns 502 when the store module service throws", async () => {
     const listStores = jest.fn(async () => {
       throw new Error("store module down")

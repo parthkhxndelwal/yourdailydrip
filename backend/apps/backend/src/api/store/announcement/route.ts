@@ -31,7 +31,7 @@ function parseAnnouncementBar(
     return null
   }
   const endsAt = bar.ends_at
-  if (endsAt !== null) {
+  if (endsAt !== null && endsAt !== "") {
     if (typeof endsAt !== "string" || Number.isNaN(new Date(endsAt).getTime())) {
       return null
     }
@@ -50,7 +50,7 @@ function parseAnnouncementBar(
       : null
   return {
     text,
-    ends_at: endsAt ?? null,
+    ends_at: endsAt ? endsAt : null,
     show_countdown: typeof showCountdown === "boolean" ? showCountdown : true,
     link,
   }

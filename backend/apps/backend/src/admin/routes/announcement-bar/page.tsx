@@ -37,7 +37,11 @@ function toLocalDateTimeInput(iso: string): string {
 }
 
 function fromLocalDateTimeInput(value: string): string {
-  return new Date(value).toISOString()
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return ""
+  }
+  return date.toISOString()
 }
 
 const AnnouncementBarPage = () => {
