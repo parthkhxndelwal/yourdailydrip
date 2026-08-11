@@ -1,0 +1,200 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - generic [ref=f2e5]: ✦
+      - text: Shipping rates calculated at checkout from your pincode
+    - generic [ref=f2e6]:
+      - generic [ref=f2e7]: ✦
+      - text: FLAT 20% off your first order — code DRIP20
+    - generic [ref=f2e8]:
+      - generic [ref=f2e9]: ✦
+      - text: Buy any 2 hair care products, get a scalp massager free
+    - generic [ref=f2e10]:
+      - generic [ref=f2e11]: ✦
+      - text: Dermatologist tested · Cruelty free · Made in India
+    - generic [ref=f2e12]:
+      - generic [ref=f2e13]: ✦
+      - text: Same-day dispatch on orders placed before 4 PM
+    - generic [ref=f2e14]:
+      - generic [ref=f2e15]: ✦
+      - text: Shipping rates calculated at checkout from your pincode
+    - generic [ref=f2e16]:
+      - generic [ref=f2e17]: ✦
+      - text: FLAT 20% off your first order — code DRIP20
+    - generic [ref=f2e18]:
+      - generic [ref=f2e19]: ✦
+      - text: Buy any 2 hair care products, get a scalp massager free
+    - generic [ref=f2e20]:
+      - generic [ref=f2e21]: ✦
+      - text: Dermatologist tested · Cruelty free · Made in India
+    - generic [ref=f2e22]:
+      - generic [ref=f2e23]: ✦
+      - text: Same-day dispatch on orders placed before 4 PM
+  - banner [ref=f2e24]:
+    - generic [ref=f2e25]:
+      - link "DailyDrip" [ref=f2e26] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=f2e27]:
+        - button "Shop" [ref=f2e28]
+        - link "Hair Care" [ref=f2e31] [cursor=pointer]:
+          - /url: /hair-care
+        - link "Skin Care" [ref=f2e32] [cursor=pointer]:
+          - /url: /skin-care
+        - link "Track Order" [ref=f2e33] [cursor=pointer]:
+          - /url: /track-order
+      - generic [ref=f2e38]:
+        - button "Search" [ref=f2e39] [cursor=pointer]
+        - link "Wishlist" [ref=f2e40] [cursor=pointer]:
+          - /url: /wishlist
+        - link "Cart" [ref=f2e41] [cursor=pointer]:
+          - /url: /cart
+        - link "Account" [ref=f2e42] [cursor=pointer]:
+          - /url: /account
+  - main [ref=f2e43]:
+    - generic [ref=f2e119]:
+      - link "Home" [ref=f2e120] [cursor=pointer]:
+        - /url: /
+      - text: /
+      - link "Hair Care" [ref=f2e121] [cursor=pointer]:
+        - /url: /hair-care
+      - text: / Rooted Hair Growth Oil
+    - generic [ref=f2e122]:
+      - generic [ref=f2e123]:
+        - img "Rooted Hair Growth Oil — view 1" [ref=f2e124]
+        - generic [ref=f2e125]:
+          - button "View image 1" [ref=f2e126]
+          - button "View image 2" [ref=f2e127]
+          - button "View image 3" [ref=f2e128]
+      - generic [ref=f2e129]:
+        - paragraph [ref=f2e130]: Rosemary + bhringraj blend
+        - heading "Rooted Hair Growth Oil" [level=1] [ref=f2e131]
+        - generic [ref=f2e132]:
+          - generic "4.7 out of 5 stars" [ref=f2e133]
+          - generic [ref=f2e144]: "4.7"
+          - link "3 reviews" [ref=f2e145] [cursor=pointer]:
+            - /url: "#reviews"
+        - generic [ref=f2e146]:
+          - generic [ref=f2e147]: ₹649
+          - generic [ref=f2e148]: ₹899
+          - generic [ref=f2e149]: Save 28%
+        - paragraph [ref=f2e150]: Inclusive of all taxes · 100 ml
+        - paragraph [ref=f2e151]: A non-greasy pre-wash oil with rosemary and bhringraj that supports thicker, fuller-looking hair.
+        - paragraph [ref=f2e152]: "Suitable for: All hair types, especially thinning or dry hair"
+        - paragraph [ref=f2e153]: "Availability: In stock — ships today"
+        - generic [ref=f2e154]:
+          - generic [ref=f2e155]:
+            - button "Decrease quantity" [ref=f2e156]: −
+            - generic [ref=f2e157]: "1"
+            - button "Increase quantity" [ref=f2e158]: +
+          - button "Add to Cart" [ref=f2e159] [cursor=pointer]
+          - link "Buy Now" [ref=f2e160] [cursor=pointer]:
+            - /url: /cart
+          - button "Add to wishlist" [ref=f2e161] [cursor=pointer]
+        - generic [ref=f2e162]:
+          - paragraph [ref=f2e163]: Shipping calculated at checkout from your address
+          - paragraph [ref=f2e169]: 14-day easy returns on unopened items
+          - paragraph [ref=f2e173]: Same-day dispatch before 4 PM IST
+          - paragraph [ref=f2e179]: Refunds credited in 5–7 working days
+        - generic [ref=f2e183]:
+          - generic [ref=f2e184]:
+            - heading [level=3] [ref=f2e185]:
+              - button "Detailed description" [expanded] [ref=f2e186] [cursor=pointer]
+            - region "Detailed description" [ref=f2e189]:
+              - generic [ref=f2e190]: Cold-pressed sesame and grapeseed oils carry rosemary, bhringraj and amla extracts to the scalp, where they support circulation and reduce breakage at the root. Unlike traditional heavy oils, Rooted washes out with a single shampoo and leaves no residue.
+          - heading [level=3] [ref=f2e192]:
+            - button "Key benefits" [ref=f2e193] [cursor=pointer]
+          - heading [level=3] [ref=f2e197]:
+            - button "Ingredients & contents" [ref=f2e198] [cursor=pointer]
+          - heading [level=3] [ref=f2e202]:
+            - button "How to use" [ref=f2e203] [cursor=pointer]
+          - heading [level=3] [ref=f2e207]:
+            - button "Shipping, returns & refunds" [ref=f2e208] [cursor=pointer]
+    - generic [ref=f2e211]:
+      - heading "Ratings & customer reviews" [level=2] [ref=f2e212]
+      - generic [ref=f2e213]:
+        - generic [ref=f2e214]: "4.7"
+        - generic [ref=f2e215]:
+          - generic "4.7 out of 5 stars" [ref=f2e216]
+          - paragraph [ref=f2e227]: Based on 3 verified purchases
+      - generic [ref=f2e228]:
+        - article [ref=f2e229]:
+          - generic "5 out of 5 stars" [ref=f2e230]
+          - heading "Worth every rupee" [level=3] [ref=f2e241]
+          - paragraph [ref=f2e242]: Three months in and my hairline has visible baby hair. The smell is herbal, not overpowering.
+          - paragraph [ref=f2e243]: Ananya R. · Verified buyer · 12 June 2026
+        - article [ref=f2e244]:
+          - generic "4 out of 5 stars" [ref=f2e245]
+          - heading "Gentle and effective" [level=3] [ref=f2e256]
+          - paragraph [ref=f2e257]: Rinses out with one wash, which no other oil has managed for me.
+          - paragraph [ref=f2e258]: Meera K. · Verified buyer · 28 May 2026
+        - article [ref=f2e259]:
+          - generic "5 out of 5 stars" [ref=f2e260]
+          - heading "Repurchasing already" [level=3] [ref=f2e271]
+          - paragraph [ref=f2e272]: Light texture, clean scent and my routine finally feels consistent. Delivery was quick too.
+          - paragraph [ref=f2e273]: Rahul S. · Verified buyer · 9 May 2026
+    - generic [ref=f2e274]:
+      - heading "You may also like" [level=2] [ref=f2e275]
+      - paragraph [ref=f2e277]: More products arriving soon.
+  - contentinfo [ref=f2e55]:
+    - generic [ref=f2e56]:
+      - generic [ref=f2e57]:
+        - paragraph [ref=f2e58]: DailyDrip
+        - paragraph [ref=f2e59]: Clean, dermatologist-tested skin and hair care made in India. Honest formulas, full ingredient lists, no empty promises.
+        - generic [ref=f2e60]:
+          - link "Instagram" [ref=f2e61] [cursor=pointer]:
+            - /url: https://instagram.com/dailydrip
+          - link "Facebook" [ref=f2e65] [cursor=pointer]:
+            - /url: https://facebook.com/dailydrip
+          - link "YouTube" [ref=f2e68] [cursor=pointer]:
+            - /url: https://youtube.com/@dailydrip
+          - link "X (Twitter)" [ref=f2e72] [cursor=pointer]:
+            - /url: https://x.com/dailydrip
+          - link "LinkedIn" [ref=f2e75] [cursor=pointer]:
+            - /url: https://linkedin.com/company/dailydrip
+      - generic [ref=f2e80]:
+        - heading "Company" [level=3] [ref=f2e81]
+        - list [ref=f2e82]:
+          - listitem [ref=f2e83]:
+            - link "About Us" [ref=f2e84] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=f2e85]:
+            - link "Our Story / Our Values" [ref=f2e86] [cursor=pointer]:
+              - /url: /our-story
+          - listitem [ref=f2e87]:
+            - link "Blogs" [ref=f2e88] [cursor=pointer]:
+              - /url: /blogs
+          - listitem [ref=f2e89]:
+            - link "How to Use" [ref=f2e90] [cursor=pointer]:
+              - /url: /how-to-use
+      - generic [ref=f2e91]:
+        - heading "Support" [level=3] [ref=f2e92]
+        - list [ref=f2e93]:
+          - listitem [ref=f2e94]:
+            - link "Track Order" [ref=f2e95] [cursor=pointer]:
+              - /url: /track-order
+          - listitem [ref=f2e96]:
+            - link "Shipping Policy" [ref=f2e97] [cursor=pointer]:
+              - /url: /shipping-policy
+          - listitem [ref=f2e98]:
+            - link "Return & Refund Policy" [ref=f2e99] [cursor=pointer]:
+              - /url: /returns
+          - listitem [ref=f2e100]:
+            - link "Privacy Notice" [ref=f2e101] [cursor=pointer]:
+              - /url: /privacy
+      - generic [ref=f2e102]:
+        - heading "Reach us" [level=3] [ref=f2e103]
+        - list [ref=f2e104]:
+          - listitem [ref=f2e105]: Daily Drip Wellness Pvt. Ltd.
+          - listitem [ref=f2e106]: 4th Floor, Prestige Atrium, Bengaluru 560001
+          - listitem [ref=f2e107]:
+            - link "care@dailydrip.in" [ref=f2e108] [cursor=pointer]:
+              - /url: mailto:care@dailydrip.in
+          - listitem [ref=f2e109]:
+            - link "+91 80001 12233" [ref=f2e110] [cursor=pointer]:
+              - /url: tel:+918000112233
+          - listitem [ref=f2e111]: Mon–Sat, 9 AM – 7 PM IST
+    - generic [ref=f2e113]:
+      - paragraph [ref=f2e114]: © 2026 Daily Drip Wellness Pvt. Ltd. All rights reserved.
+      - paragraph [ref=f2e115]: GSTIN 29AABCD1234E1Z5 · CIN U24246KA2021PTC123456
+  - button "Chat with us" [ref=f2e116]: Chat
+  - region "Notifications alt+T"

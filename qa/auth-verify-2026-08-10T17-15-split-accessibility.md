@@ -1,0 +1,140 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e3]:
+    - paragraph [ref=f1e4]: Pre-Launch Sale — Flat 20% Off
+    - generic "Time remaining until the pre-launch sale ends" [ref=f1e5]: "14d : 06h : 47m : 15s"
+  - banner [ref=f1e6]:
+    - generic [ref=f1e7]:
+      - button "Open menu" [ref=f1e177] [cursor=pointer]
+      - link "Daily Drip home" [ref=f1e8] [cursor=pointer]:
+        - /url: /
+        - img "Daily Drip" [ref=f1e9]
+      - generic [ref=f1e21]:
+        - button "Search" [ref=f1e22] [cursor=pointer]
+        - link "Wishlist" [ref=f1e23] [cursor=pointer]:
+          - /url: /wishlist
+        - link "Cart" [ref=f1e24] [cursor=pointer]:
+          - /url: /cart
+  - main [ref=f1e26]:
+    - generic [ref=f1e28]:
+      - generic [ref=f1e30]:
+        - paragraph [ref=f1e31]: Member Access
+        - heading "Welcome back" [level=1] [ref=f1e170]
+        - paragraph [ref=f1e33]: Sign in to track orders, save your wishlist and reorder faster.
+        - generic [ref=f1e34]:
+          - tablist [ref=f1e35]:
+            - tab "Sign in" [active] [selected] [ref=f1e36] [cursor=pointer]
+            - tab "Sign up" [ref=f1e37] [cursor=pointer]
+          - tabpanel "Sign in" [ref=f1e38]:
+            - generic [ref=f1e171]:
+              - generic [ref=f1e172]:
+                - text: Email
+                - textbox "Email" [ref=f1e173]:
+                  - /placeholder: you@example.com
+              - generic [ref=f1e174]:
+                - text: Password
+                - textbox "Password" [ref=f1e175]:
+                  - /placeholder: ••••••••
+              - button "Sign in" [ref=f1e176] [cursor=pointer]
+        - paragraph [ref=f1e45]:
+          - text: By continuing you agree to our
+          - link "Privacy Policy" [ref=f1e46] [cursor=pointer]:
+            - /url: /privacy
+          - text: and
+          - link "Terms" [ref=f1e47] [cursor=pointer]:
+            - /url: /terms
+          - text: .
+      - generic [ref=f1e49]:
+        - generic [ref=f1e50]:
+          - paragraph [ref=f1e51]: DAILY DRIP
+          - paragraph [ref=f1e52]: Science. Nature. Daily.
+        - generic [ref=f1e56]:
+          - img "Advanced Hair Density Serum — amber glass bottle resting on fresh green botanicals" [ref=f1e57]
+          - generic [ref=f1e58]:
+            - generic [ref=f1e59]: Clean
+            - generic [ref=f1e60]: Beauty
+            - generic [ref=f1e61]: Made in India
+          - generic [ref=f1e62]:
+            - generic [ref=f1e63]: Daily Drip
+            - generic [ref=f1e64]: Advanced Hair Density Serum
+            - generic [ref=f1e65]: 30 ml
+        - list [ref=f1e66]:
+          - listitem [ref=f1e67]:
+            - generic [ref=f1e71]: Clinically Researched Actives
+          - listitem [ref=f1e72]:
+            - generic [ref=f1e76]: Non-Sticky & Fast Absorbing
+          - listitem [ref=f1e77]:
+            - generic [ref=f1e81]: For All Hair Types
+          - listitem [ref=f1e82]:
+            - generic [ref=f1e85]: Clean & Safe Formula
+        - generic [ref=f1e86]:
+          - generic [ref=f1e87]:
+            - generic [ref=f1e88]: AR
+            - generic [ref=f1e89]: PK
+            - generic [ref=f1e90]: SM
+          - paragraph [ref=f1e91]: Trusted by 5000+ early believers
+  - contentinfo [ref=f1e92]:
+    - generic [ref=f1e93]:
+      - generic [ref=f1e94]:
+        - generic [ref=f1e95]:
+          - paragraph [ref=f1e96]: DAILY DRIP
+          - paragraph [ref=f1e97]: Science. Nature. Daily.
+          - paragraph [ref=f1e98]: Dermatologist-tested skin and hair care made in India — honest formulas, full ingredient lists, no empty promises.
+          - generic [ref=f1e99]:
+            - link "Instagram" [ref=f1e100] [cursor=pointer]:
+              - /url: https://instagram.com/dailydrip
+            - link "Facebook" [ref=f1e104] [cursor=pointer]:
+              - /url: https://facebook.com/dailydrip
+            - link "YouTube" [ref=f1e107] [cursor=pointer]:
+              - /url: https://youtube.com/@dailydrip
+            - link "X (Twitter)" [ref=f1e111] [cursor=pointer]:
+              - /url: https://x.com/dailydrip
+            - link "LinkedIn" [ref=f1e114] [cursor=pointer]:
+              - /url: https://linkedin.com/company/dailydrip
+          - paragraph [ref=f1e119]: care@dailydrip.in · +91 80001 12233Bengaluru, India
+        - generic [ref=f1e120]:
+          - heading "Shop" [level=3] [ref=f1e121]
+          - list [ref=f1e122]:
+            - listitem [ref=f1e123]:
+              - link "All Products" [ref=f1e124] [cursor=pointer]:
+                - /url: /shop
+            - listitem [ref=f1e125]:
+              - link "Haircare" [ref=f1e126] [cursor=pointer]:
+                - /url: /hair-care
+            - listitem [ref=f1e127]:
+              - link "Ingredients" [ref=f1e128] [cursor=pointer]:
+                - /url: /#ingredients
+        - generic [ref=f1e129]:
+          - heading "Company" [level=3] [ref=f1e130]
+          - list [ref=f1e131]:
+            - listitem [ref=f1e132]:
+              - link "Our Story" [ref=f1e133] [cursor=pointer]:
+                - /url: /our-story
+            - listitem [ref=f1e134]:
+              - link "Blog" [ref=f1e135] [cursor=pointer]:
+                - /url: /blogs
+            - listitem [ref=f1e136]:
+              - link "Contact Us" [ref=f1e137] [cursor=pointer]:
+                - /url: mailto:care@dailydrip.in
+        - generic [ref=f1e138]:
+          - heading "Help" [level=3] [ref=f1e139]
+          - list [ref=f1e140]:
+            - listitem [ref=f1e141]:
+              - link "FAQs" [ref=f1e142] [cursor=pointer]:
+                - /url: /#faqs
+            - listitem [ref=f1e143]:
+              - link "Shipping & Returns" [ref=f1e144] [cursor=pointer]:
+                - /url: /shipping-policy
+            - listitem [ref=f1e145]:
+              - link "Terms & Conditions" [ref=f1e146] [cursor=pointer]:
+                - /url: /terms
+      - generic [ref=f1e148]:
+        - generic [ref=f1e149]:
+          - heading "Stay in the know" [level=3] [ref=f1e150]
+          - paragraph [ref=f1e151]: Get early access to launches, offers and haircare tips.
+        - generic [ref=f1e152]:
+          - generic [ref=f1e153]: Email address
+          - textbox "Email address" [ref=f1e154]:
+            - /placeholder: Your email
+          - button "Subscribe" [ref=f1e155]
+      - paragraph [ref=f1e159]: © 2026 Daily Drip. All rights reserved.
+  - region "Notifications alt+T"

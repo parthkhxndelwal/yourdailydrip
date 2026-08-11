@@ -1,0 +1,202 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: ✦
+      - text: Shipping rates calculated at checkout from your pincode
+    - generic [ref=e6]:
+      - generic [ref=e7]: ✦
+      - text: FLAT 20% off your first order — code DRIP20
+    - generic [ref=e8]:
+      - generic [ref=e9]: ✦
+      - text: Buy any 2 hair care products, get a scalp massager free
+    - generic [ref=e10]:
+      - generic [ref=e11]: ✦
+      - text: Dermatologist tested · Cruelty free · Made in India
+    - generic [ref=e12]:
+      - generic [ref=e13]: ✦
+      - text: Same-day dispatch on orders placed before 4 PM
+    - generic [ref=e14]:
+      - generic [ref=e15]: ✦
+      - text: Shipping rates calculated at checkout from your pincode
+    - generic [ref=e16]:
+      - generic [ref=e17]: ✦
+      - text: FLAT 20% off your first order — code DRIP20
+    - generic [ref=e18]:
+      - generic [ref=e19]: ✦
+      - text: Buy any 2 hair care products, get a scalp massager free
+    - generic [ref=e20]:
+      - generic [ref=e21]: ✦
+      - text: Dermatologist tested · Cruelty free · Made in India
+    - generic [ref=e22]:
+      - generic [ref=e23]: ✦
+      - text: Same-day dispatch on orders placed before 4 PM
+  - banner [ref=e24]:
+    - generic [ref=e25]:
+      - link "DailyDrip" [ref=e26] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=e27]:
+        - button "Shop" [ref=e28]
+        - link "Hair Care" [ref=e31] [cursor=pointer]:
+          - /url: /hair-care
+        - link "Skin Care" [ref=e32] [cursor=pointer]:
+          - /url: /skin-care
+        - link "Track Order" [ref=e33] [cursor=pointer]:
+          - /url: /track-order
+      - generic [ref=e38]:
+        - button "Search" [ref=e39] [cursor=pointer]
+        - link "Wishlist" [ref=e40] [cursor=pointer]:
+          - /url: /wishlist
+        - link "Cart" [ref=e41] [cursor=pointer]:
+          - /url: /cart
+        - link "Account" [ref=e42] [cursor=pointer]:
+          - /url: /account
+  - main [ref=e43]:
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: Skin & hair care · Made in India
+        - heading "A routine that actually holds up." [level=1] [ref=e48]: A routine thatactually holds up.
+        - paragraph [ref=e49]: Daily Drip makes dermatologist-tested skin and hair care with short, honest ingredient lists — and tells you exactly how much of each active is inside.
+        - generic [ref=e50]:
+          - link "Shop the range" [ref=e51] [cursor=pointer]:
+            - /url: /shop
+          - link "Build my routine" [ref=e52] [cursor=pointer]:
+            - /url: /how-to-use
+      - img "Amber serum bottle resting on fresh green botanical leaves" [ref=e53]
+    - generic [ref=e55]:
+      - generic [ref=e60]:
+        - paragraph [ref=e61]: Clean formulas
+        - paragraph [ref=e62]: No sulphates, parabens or hidden fragrance.
+      - generic [ref=e67]:
+        - paragraph [ref=e68]: Derm tested
+        - paragraph [ref=e69]: Every batch tested and safety assessed.
+      - generic [ref=e74]:
+        - paragraph [ref=e75]: Full disclosure
+        - paragraph [ref=e76]: Actives listed with exact percentages.
+      - generic [ref=e83]:
+        - paragraph [ref=e84]: Fast delivery
+        - paragraph [ref=e85]: Same-day dispatch before 4 PM, pan-India.
+    - generic [ref=e86]:
+      - generic [ref=e87]:
+        - heading "Skin Care" [level=2] [ref=e88]
+        - link "View all" [ref=e89] [cursor=pointer]:
+          - /url: /skin-care
+      - paragraph [ref=e91]: We couldn't load products right now. Please refresh.
+    - generic [ref=e92]:
+      - generic [ref=e93]:
+        - heading "Hair Care" [level=2] [ref=e94]
+        - link "View all" [ref=e95] [cursor=pointer]:
+          - /url: /hair-care
+      - paragraph [ref=e97]: We couldn't load products right now. Please refresh.
+    - generic [ref=e99]:
+      - generic [ref=e100]:
+        - generic [ref=e101]:
+          - paragraph [ref=e102]: Reviews
+          - heading "What Our Customers Say" [level=2] [ref=e103]
+        - generic [ref=e104]:
+          - button "Previous testimonial" [ref=e105]
+          - button "Next testimonial" [ref=e108]
+      - generic [ref=e112]:
+        - figure "Ishita Verma · Bengaluru" [ref=e114]:
+          - generic "5 out of 5 stars" [ref=e118]
+          - blockquote [ref=e129]: “I've tried a dozen vitamin C serums and Daily Drip is the first that didn't sting. Six weeks in, my acne marks have properly faded.”
+          - generic [ref=e130]:
+            - text: Ishita Verma
+            - generic [ref=e131]: · Bengaluru
+        - figure "Karan Mehta · Pune" [ref=e133]:
+          - generic "5 out of 5 stars" [ref=e137]
+          - blockquote [ref=e148]: “The Rooted hair oil washes out in one shampoo — that alone sold me. My hairline has visibly filled in since March.”
+          - generic [ref=e149]:
+            - text: Karan Mehta
+            - generic [ref=e150]: · Pune
+        - figure "Sneha Iyer · Chennai" [ref=e152]:
+          - generic "4 out of 5 stars" [ref=e156]
+          - blockquote [ref=e167]: “Honest ingredient lists, no fake promises. Their support team walked me through a routine for rosacea over chat within minutes.”
+          - generic [ref=e168]:
+            - text: Sneha Iyer
+            - generic [ref=e169]: · Chennai
+        - figure "Farhan Qureshi · Hyderabad" [ref=e171]:
+          - generic "5 out of 5 stars" [ref=e175]
+          - blockquote [ref=e186]: “Ordered Thursday night, delivered Saturday morning. The barrier cream saved my skin after a bad chemical peel.”
+          - generic [ref=e187]:
+            - text: Farhan Qureshi
+            - generic [ref=e188]: · Hyderabad
+        - figure "Divya Nair · Kochi" [ref=e190]:
+          - generic "5 out of 5 stars" [ref=e194]
+          - blockquote [ref=e205]: “Everything smells clean and herbal, nothing perfumed. My whole family uses the gentle shampoo now, including my daughter.”
+          - generic [ref=e206]:
+            - text: Divya Nair
+            - generic [ref=e207]: · Kochi
+      - generic [ref=e208]:
+        - button "Go to testimonial 1" [ref=e209]
+        - button "Go to testimonial 2" [ref=e210]
+        - button "Go to testimonial 3" [ref=e211]
+        - button "Go to testimonial 4" [ref=e212]
+        - button "Go to testimonial 5" [ref=e213]
+    - generic [ref=e214]:
+      - heading "Not sure where to start?" [level=2] [ref=e215]
+      - paragraph [ref=e216]: Tell our chatbot assistant your skin or hair type and we'll suggest a three-step routine in under a minute — no sign-up needed.
+      - link "See routine guides" [ref=e217] [cursor=pointer]:
+        - /url: /how-to-use
+  - contentinfo [ref=e218]:
+    - generic [ref=e219]:
+      - generic [ref=e220]:
+        - paragraph [ref=e221]: DailyDrip
+        - paragraph [ref=e222]: Clean, dermatologist-tested skin and hair care made in India. Honest formulas, full ingredient lists, no empty promises.
+        - generic [ref=e223]:
+          - link "Instagram" [ref=e224] [cursor=pointer]:
+            - /url: https://instagram.com/dailydrip
+          - link "Facebook" [ref=e228] [cursor=pointer]:
+            - /url: https://facebook.com/dailydrip
+          - link "YouTube" [ref=e231] [cursor=pointer]:
+            - /url: https://youtube.com/@dailydrip
+          - link "X (Twitter)" [ref=e235] [cursor=pointer]:
+            - /url: https://x.com/dailydrip
+          - link "LinkedIn" [ref=e238] [cursor=pointer]:
+            - /url: https://linkedin.com/company/dailydrip
+      - generic [ref=e243]:
+        - heading "Company" [level=3] [ref=e244]
+        - list [ref=e245]:
+          - listitem [ref=e246]:
+            - link "About Us" [ref=e247] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=e248]:
+            - link "Our Story / Our Values" [ref=e249] [cursor=pointer]:
+              - /url: /our-story
+          - listitem [ref=e250]:
+            - link "Blogs" [ref=e251] [cursor=pointer]:
+              - /url: /blogs
+          - listitem [ref=e252]:
+            - link "How to Use" [ref=e253] [cursor=pointer]:
+              - /url: /how-to-use
+      - generic [ref=e254]:
+        - heading "Support" [level=3] [ref=e255]
+        - list [ref=e256]:
+          - listitem [ref=e257]:
+            - link "Track Order" [ref=e258] [cursor=pointer]:
+              - /url: /track-order
+          - listitem [ref=e259]:
+            - link "Shipping Policy" [ref=e260] [cursor=pointer]:
+              - /url: /shipping-policy
+          - listitem [ref=e261]:
+            - link "Return & Refund Policy" [ref=e262] [cursor=pointer]:
+              - /url: /returns
+          - listitem [ref=e263]:
+            - link "Privacy Notice" [ref=e264] [cursor=pointer]:
+              - /url: /privacy
+      - generic [ref=e265]:
+        - heading "Reach us" [level=3] [ref=e266]
+        - list [ref=e267]:
+          - listitem [ref=e268]: Daily Drip Wellness Pvt. Ltd.
+          - listitem [ref=e269]: 4th Floor, Prestige Atrium, Bengaluru 560001
+          - listitem [ref=e270]:
+            - link "care@dailydrip.in" [ref=e271] [cursor=pointer]:
+              - /url: mailto:care@dailydrip.in
+          - listitem [ref=e272]:
+            - link "+91 80001 12233" [ref=e273] [cursor=pointer]:
+              - /url: tel:+918000112233
+          - listitem [ref=e274]: Mon–Sat, 9 AM – 7 PM IST
+    - generic [ref=e276]:
+      - paragraph [ref=e277]: © 2026 Daily Drip Wellness Pvt. Ltd. All rights reserved.
+      - paragraph [ref=e278]: GSTIN 29AABCD1234E1Z5 · CIN U24246KA2021PTC123456
+  - button "Chat with us" [ref=e279]: Chat
+  - region "Notifications alt+T"
