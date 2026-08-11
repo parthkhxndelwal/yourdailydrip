@@ -91,7 +91,9 @@ export function providerFromContainer(
 ): { getOptions: () => IthinkProviderOptions } | undefined {
   const provider = resolveIthinkProvider<{ getOptions?: () => IthinkProviderOptions }>(container)
   if (provider && typeof provider.getOptions === "function") {
-    return { getOptions: provider.getOptions }
+    // Bound through a closure: extracting getOptions as a bare method reference
+    // would lose the service instance as `this`, returning undefined options.
+    return { getOptions: () => provider.getOptions() }
   }
   return undefined
 }
