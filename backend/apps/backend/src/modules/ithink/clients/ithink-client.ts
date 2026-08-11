@@ -1,8 +1,16 @@
 import { MedusaError } from "@medusajs/framework/utils"
-import { buildOrderBody, buildRateBody, withAuth } from "./payloads"
 import {
+  buildGetDetailsBody,
+  buildOrderBody,
+  buildRateBody,
+  buildSyncOrderBody,
+  withAuth,
+} from "./payloads"
+import {
+  DETAILS_CHUNK_SIZE,
   ENDPOINTS,
   REQUEST_TIMEOUT_MS,
+  SYNC_CHUNK_SIZE,
   type AddOrderParams,
   type AddOrderSuccess,
   type GetAwbParams,
@@ -10,13 +18,17 @@ import {
   type IthinkEnvelope,
   type IthinkRate,
   type IthinkTrackShipment,
+  type OrderDetails,
   type RateCheckParams,
   type RateCheckResult,
+  type SyncOrderResponse,
 } from "./types"
 
 export {
+  buildGetDetailsBody,
   buildOrderBody,
   buildRateBody,
+  buildSyncOrderBody,
   toIthinkDateTime,
   toNumber,
   toOrderDate,
@@ -45,6 +57,36 @@ function isOrderEntry(value: unknown): value is AddOrderSuccess {
     value !== null &&
     (value as AddOrderSuccess).status === "Success"
   )
+}
+
+function isSyncEntry(value: unknown): value is SyncOrderResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as SyncOrderResponse).refnum === "string" &&
+    (value as SyncOrderResponse).refnum.length > 0
+  )
+}
+
+function stringValue(value: unknown): string | undefined {
+  return typeof value === "string" && value !== "" ? value : undefined
+}
+
+function toOrderDetails(key: string, value: unknown): OrderDetails {
+  const entry =
+    typeof value === "object" && value !== null
+      ? (value as Record<string, unknown>)
+      : {}
+  return {
+    order_no:
+      typeof entry.order === "string" && entry.order !== ""
+        ? entry.order
+        : key || undefined,
+    awb_no: stringValue(entry.awb_no),
+    logistic: stringValue(entry.logistic),
+    latest_courier_status: stringValue(entry.latest_courier_status),
+    expected_delivery_date: stringValue(entry.expected_delivery_date),
+  }
 }
 
 function firstNonEmpty(...values: Array<string | undefined>): string | undefined {
@@ -86,7 +128,7 @@ export class IthinkClient {
   }
 
   async addOrder(params: AddOrderParams): Promise<AddOrderSuccess> {
-    const envelope = await this.post(ENDPOINTS.order, buildOrderBody(params))
+    const envelope = await this.post(ENDPOINTS.order, buildOrderBody(params, this.options))
     const entry = this.entryList(envelope.data).find(isOrderEntry)
     if (!entry) {
       const entryRemark = this.entryList(envelope.data)
@@ -101,6 +143,58 @@ export class IthinkClient {
       )
     }
     return entry
+  }
+
+  async syncOrders(
+    orders: AddOrderParams[],
+    options: { tolerateNoData?: boolean } = {}
+  ): Promise<string[]> {
+    const refnums: string[] = []
+    for (const chunk of chunkArray(orders, SYNC_CHUNK_SIZE)) {
+      const envelope = await this.post(
+        ENDPOINTS.syncOrder,
+        buildSyncOrderBody(chunk, this.options),
+        options
+      )
+      const entries = this.entryList(envelope.data)
+      const successes = entries.filter(isSyncEntry)
+      refnums.push(...successes.map((entry) => entry.refnum))
+      if (successes.length < entries.length) {
+        const entryRemark = entries
+          .map((entry) => (entry as { remark?: string }).remark)
+          .find((remark): remark is string => Boolean(remark))
+        const message =
+          firstNonEmpty(envelope.message, envelope.html_message, envelope.msg, entryRemark) ??
+          "unknown error"
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `iThink could not sync shipments: ${message}`
+        )
+      }
+    }
+    return refnums
+  }
+
+  async getOrderDetails(
+    orderNos: string[],
+    options: { tolerateNoData?: boolean } = {}
+  ): Promise<OrderDetails[]> {
+    const unique = [...new Set(orderNos.filter((orderNo) => orderNo.trim() !== ""))]
+    if (unique.length === 0) {
+      return []
+    }
+    const details: OrderDetails[] = []
+    for (const chunk of chunkArray(unique, DETAILS_CHUNK_SIZE)) {
+      const envelope = await this.post(
+        ENDPOINTS.orderDetails,
+        buildGetDetailsBody(chunk),
+        { tolerateNoData: true, ...options }
+      )
+      for (const [key, value] of this.detailsEntries(envelope.data)) {
+        details.push(toOrderDetails(key, value))
+      }
+    }
+    return details
   }
 
   async cancelOrder(awbNumbers: string[]): Promise<Record<string, unknown>> {
@@ -172,6 +266,13 @@ export class IthinkClient {
       return Object.values(data as Record<string, unknown>)
     }
     return []
+  }
+
+  private detailsEntries(data: unknown): Array<[string, unknown]> {
+    if (typeof data === "object" && data !== null && !Array.isArray(data)) {
+      return Object.entries(data as Record<string, unknown>)
+    }
+    return this.entryList(data).map((value) => ["", value] as [string, unknown])
   }
 
   private dataObject(envelope: IthinkEnvelope): Record<string, unknown> {

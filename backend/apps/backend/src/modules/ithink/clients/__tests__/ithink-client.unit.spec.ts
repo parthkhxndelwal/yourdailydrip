@@ -1,5 +1,11 @@
 import type { Logger } from "@medusajs/framework/types"
-import { IthinkClient, buildOrderBody, buildRateBody } from "../ithink-client"
+import {
+  IthinkClient,
+  buildGetDetailsBody,
+  buildOrderBody,
+  buildRateBody,
+  buildSyncOrderBody,
+} from "../ithink-client"
 import { IthinkFulfillmentService } from "../../services/ithink-fulfillment"
 import { cartTotal } from "../../services/mappers"
 import type { IthinkClientOptions, RateCheckParams } from "../types"
@@ -139,6 +145,62 @@ describe("buildOrderBody", () => {
     const body = buildOrderBody({ ...orderParams, logistics: "delhivery" })
     expect(body.logistics).toBe("delhivery")
   })
+
+  it("sends the return address id from the options parameter", () => {
+    const body = buildOrderBody(orderParams, { returnAddressId: "return-1" })
+    const shipment = (body.shipments as Record<string, unknown>[])[0]
+    expect(shipment.return_address_id).toBe("return-1")
+  })
+
+  it("defaults return_address_id to an empty string for backward compatibility", () => {
+    const body = buildOrderBody(orderParams)
+    const shipment = (body.shipments as Record<string, unknown>[])[0]
+    expect(shipment.return_address_id).toBe("")
+  })
+})
+
+describe("buildSyncOrderBody", () => {
+  it("matches the add-order payload shape without a logistics key", () => {
+    const body = buildSyncOrderBody([orderParamsForAddOrder()], options)
+    expect(body.shipments).toHaveLength(1)
+    const shipment = (body.shipments as Record<string, unknown>[])[0]
+    expect(shipment.order).toBe("1001")
+    expect(shipment.payment_mode).toBe("Prepaid")
+    expect(shipment.phone).toBe("9876543210")
+    expect(shipment.alt_phone).toBe("9876543210")
+    expect(shipment.gst_number).toBe("")
+    expect(shipment.eway_bill_number).toBe("")
+    expect(shipment.products).toEqual([
+      { product_name: "Serum", product_sku: "", product_quantity: "1", product_price: "749" },
+    ])
+    expect(body.pickup_address_id).toBe("addr-test")
+    expect(body.s_type).toBe("")
+    expect(body.order_type).toBe("")
+    expect("logistics" in body).toBe(false)
+    expect(JSON.stringify(body)).not.toContain("logistics")
+  })
+
+  it("accepts a single order object", () => {
+    const body = buildSyncOrderBody(orderParamsForAddOrder(), options)
+    expect(body.shipments).toHaveLength(1)
+  })
+
+  it("sends the return address id from client options", () => {
+    const body = buildSyncOrderBody(orderParamsForAddOrder(), {
+      ...options,
+      returnAddressId: "return-1",
+    })
+    const shipment = (body.shipments as Record<string, unknown>[])[0]
+    expect(shipment.return_address_id).toBe("return-1")
+  })
+})
+
+describe("buildGetDetailsBody", () => {
+  it("sends a comma-joined order_no list and no awb_number_list", () => {
+    const body = buildGetDetailsBody(["YDD-1", "YDD-2", "YDD-3"])
+    expect(body).toEqual({ order_no: "YDD-1,YDD-2,YDD-3" })
+    expect("awb_number_list" in body).toBe(false)
+  })
 })
 
 describe("cartTotal", () => {
@@ -222,6 +284,33 @@ describe("IthinkClient response parsing", () => {
       logistics: "delhivery",
     })
     expect(created.waybill).toBe("IT00000001")
+  })
+
+  it("threads the client returnAddressId option into the add-order payload", async () => {
+    let capturedInit: RequestInit | undefined
+    const client = new IthinkClient({
+      ...options,
+      returnAddressId: "return-1",
+      fetchImpl: (async (_url, init) => {
+        capturedInit = init
+        return fakeResponse({
+          status: "success",
+          data: {
+            "1": {
+              status: "Success",
+              remark: "ok",
+              waybill: "IT00000001",
+              refnum: "R1",
+              logistic_name: "delhivery",
+            },
+          },
+        })
+      }) as typeof fetch,
+    })
+    await client.addOrder(orderParamsForAddOrder())
+    const envelope = parseCapturedBody(capturedInit!).data as Record<string, unknown>
+    const shipment = (envelope.shipments as Record<string, unknown>[])[0]
+    expect(shipment.return_address_id).toBe("return-1")
   })
 
   it("parses add-order data returned as an array", async () => {
@@ -439,6 +528,180 @@ describe("IthinkClient response parsing", () => {
     expect(captured[0]).toBe(awbs.slice(0, 10).join(","))
     expect(captured[1]).toBe(awbs.slice(10).join(","))
   })
+
+  it("chunks syncOrders at 25 per request with auth inside the data envelope", async () => {
+    const captured: Record<string, unknown>[] = []
+    const client = new IthinkClient({
+      ...options,
+      fetchImpl: fakeFetch((_url, init) => {
+        const body = parseCapturedBody(init)
+        captured.push(body)
+        const data = body.data as Record<string, unknown>
+        const shipments = data.shipments as Record<string, unknown>[]
+        const response: Record<string, unknown> = {}
+        shipments.forEach((shipment, index) => {
+          response[String(index)] = { status: "Success", refnum: `REF-${shipment.order}` }
+        })
+        return { status: "success", data: response }
+      }),
+    })
+    const orders = Array.from({ length: 26 }, (_, i) => ({
+      ...orderParamsForAddOrder(),
+      orderNumber: `YDD-${i + 1}`,
+    }))
+    const refnums = await client.syncOrders(orders)
+    expect(refnums).toHaveLength(26)
+    expect(refnums[0]).toBe("REF-YDD-1")
+    expect(refnums[25]).toBe("REF-YDD-26")
+    expect(captured).toHaveLength(2)
+    expect((captured[0].data as Record<string, unknown>).shipments as unknown[]).toHaveLength(25)
+    expect((captured[1].data as Record<string, unknown>).shipments as unknown[]).toHaveLength(1)
+    const firstData = captured[0].data as Record<string, unknown>
+    expect(firstData.access_token).toBe("tok-test")
+    expect(firstData.secret_key).toBe("key-test")
+    expect("logistics" in firstData).toBe(false)
+    expect(JSON.stringify(captured[0])).not.toContain("logistics")
+  })
+
+  it("normalizes a sync error envelope to a MedusaError", async () => {
+    const client = new IthinkClient({
+      ...options,
+      fetchImpl: fakeFetch(() => ({
+        status: "error",
+        message: "Invalid access token",
+      })),
+    })
+    await expect(client.syncOrders([orderParamsForAddOrder()])).rejects.toThrow(
+      "Invalid access token"
+    )
+  })
+
+  it("surfaces the entry remark when a shipment fails to sync", async () => {
+    const client = new IthinkClient({
+      ...options,
+      fetchImpl: fakeFetch(() => ({
+        status: "success",
+        status_code: 200,
+        data: {
+          "1": { status: "error", remark: "Pincode Not Serviceable." },
+        },
+      })),
+    })
+    await expect(client.syncOrders([orderParamsForAddOrder()])).rejects.toThrow(
+      "Pincode Not Serviceable."
+    )
+  })
+
+  it("keeps 500 order numbers in a single get_details request", async () => {
+    const captured: Record<string, unknown>[] = []
+    const client = new IthinkClient({
+      ...options,
+      fetchImpl: fakeFetch((_url, init) => {
+        const body = parseCapturedBody(init)
+        captured.push(body)
+        const data = body.data as Record<string, unknown>
+        const orderNos = String(data.order_no).split(",")
+        const response: Record<string, unknown> = {}
+        for (const orderNo of orderNos) {
+          response[orderNo] = { order: orderNo, awb_no: `AWB-${orderNo}` }
+        }
+        return { status: "success", data: response }
+      }),
+    })
+    const orderNos = Array.from({ length: 500 }, (_, i) => `YDD-${i + 1}`)
+    const details = await client.getOrderDetails(orderNos)
+    expect(details).toHaveLength(500)
+    expect(captured).toHaveLength(1)
+    const data = captured[0].data as Record<string, unknown>
+    expect(String(data.order_no).split(",")).toHaveLength(500)
+    expect(data.awb_number_list).toBeUndefined()
+  })
+
+  it("splits 501 order numbers into two get_details requests", async () => {
+    const captured: Record<string, unknown>[] = []
+    const client = new IthinkClient({
+      ...options,
+      fetchImpl: fakeFetch((_url, init) => {
+        const body = parseCapturedBody(init)
+        captured.push(body)
+        const data = body.data as Record<string, unknown>
+        const orderNos = String(data.order_no).split(",")
+        const response: Record<string, unknown> = {}
+        for (const orderNo of orderNos) {
+          response[orderNo] = { order: orderNo }
+        }
+        return { status: "success", data: response }
+      }),
+    })
+    const orderNos = Array.from({ length: 501 }, (_, i) => `YDD-${i + 1}`)
+    const details = await client.getOrderDetails(orderNos)
+    expect(details).toHaveLength(501)
+    expect(captured).toHaveLength(2)
+    expect(String((captured[0].data as Record<string, unknown>).order_no).split(",")).toHaveLength(500)
+    expect(String((captured[1].data as Record<string, unknown>).order_no).split(",")).toHaveLength(1)
+  })
+
+  it("normalizes get_details entries with missing fields without throwing", async () => {
+    const client = new IthinkClient({
+      ...options,
+      fetchImpl: fakeFetch(() => ({
+        status: "success",
+        data: {
+          "YDD-1": { awb_no: "IT00000001" },
+          "YDD-2": { logistic: "Delhivery", expected_delivery_date: "2026-08-18" },
+          "YDD-3": { order: "YDD-3", latest_courier_status: "" },
+        },
+      })),
+    })
+    const details = await client.getOrderDetails(["YDD-1", "YDD-2", "YDD-3"])
+    expect(details).toHaveLength(3)
+    expect(details[0]).toEqual({
+      order_no: "YDD-1",
+      awb_no: "IT00000001",
+      logistic: undefined,
+      latest_courier_status: undefined,
+      expected_delivery_date: undefined,
+    })
+    expect(details[1]).toEqual({
+      order_no: "YDD-2",
+      awb_no: undefined,
+      logistic: "Delhivery",
+      latest_courier_status: undefined,
+      expected_delivery_date: "2026-08-18",
+    })
+    expect(details[2].order_no).toBe("YDD-3")
+    expect(details[2].latest_courier_status).toBeUndefined()
+  })
+
+  it("treats a 'No Data found.' get_details response as an empty result", async () => {
+    const client = new IthinkClient({
+      ...options,
+      fetchImpl: fakeFetch(() => ({
+        status: "error",
+        message: "No Data found.",
+      })),
+    })
+    const details = await client.getOrderDetails(["YDD-1"])
+    expect(details).toEqual([])
+  })
+
+  it("normalizes a get_details error envelope to a MedusaError", async () => {
+    const client = new IthinkClient({
+      ...options,
+      fetchImpl: fakeFetch(() => ({
+        status: "error",
+        message: "Invalid order number",
+      })),
+    })
+    await expect(client.getOrderDetails(["YDD-1"])).rejects.toThrow("Invalid order number")
+  })
+
+  it("makes no request for an empty order number list", async () => {
+    const fetchMock = jest.fn()
+    const client = new IthinkClient({ ...options, fetchImpl: fetchMock as typeof fetch })
+    expect(await client.getOrderDetails([])).toEqual([])
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
 })
 
 describe("IthinkFulfillmentService.createFulfillment", () => {
@@ -473,6 +736,7 @@ describe("IthinkFulfillmentService.createFulfillment", () => {
           secret_key: "key-test",
           pickup_address_id: "addr-test",
           gst_number: "27ABCDE1234F1Z5",
+          mode: "book",
         }
       )
       const result = await service.createFulfillment(

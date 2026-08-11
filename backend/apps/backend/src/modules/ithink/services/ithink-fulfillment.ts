@@ -10,29 +10,24 @@ import type {
   FulfillmentItemDTO,
   FulfillmentOption,
   FulfillmentOrderDTO,
+  Logger,
   ValidateFulfillmentDataContext,
 } from "@medusajs/framework/types"
-import type { Logger } from "@medusajs/framework/types"
 import { IthinkClient } from "../clients/ithink-client"
-import { toNumber, toOrderDate } from "../clients/payloads"
-import type { AddOrderLine, AddOrderParams } from "../clients/types"
+import type { IthinkMode, RateCheckResult } from "../clients/types"
+import { buildOrderParams } from "./fulfillment-params"
+import { getRateHints, validateWithRates } from "./fulfillment-validation"
 import {
   CARRIER_OPTIONS,
-  DEFAULT_WEIGHT_KG,
   cartTotal,
   numberValue,
   optionLogisticName,
-  priceForItem,
-  recipientName,
-  shipmentDimensions,
-  shipmentDimensionsForOrder,
+  resolveProviderOptions,
   stringValue,
   toClientOptions,
   totalWeightKg,
   type IthinkProviderOptions,
 } from "./mappers"
-
-export type { IthinkProviderOptions } from "./mappers"
 
 export class IthinkFulfillmentService extends AbstractFulfillmentProviderService {
   static identifier = "ithink"
@@ -44,8 +39,31 @@ export class IthinkFulfillmentService extends AbstractFulfillmentProviderService
   constructor(container: { logger: Logger }, options: IthinkProviderOptions) {
     super()
     this.logger = container.logger
-    this.options = options
-    this.client = new IthinkClient(toClientOptions(options))
+    this.options = resolveProviderOptions(options)
+    this.client = new IthinkClient(toClientOptions(this.options))
+  }
+
+  getMode(): IthinkMode {
+    return this.options.mode ?? "dashboard"
+  }
+
+  getOptions(): IthinkProviderOptions {
+    return this.options
+  }
+
+  // Storefront rate hints for a delivery pincode; reuses the shared cache and
+  // defaults (see getRateHints in fulfillment-validation). Undefined on error.
+  async getRateHints(
+    fromPincode: string,
+    toPincode: string,
+    productMrp?: number
+  ): Promise<RateCheckResult | undefined> {
+    return getRateHints(
+      { client: this.client, logger: this.logger, options: this.options },
+      fromPincode,
+      toPincode,
+      productMrp
+    )
   }
 
   async getFulfillmentOptions(): Promise<FulfillmentOption[]> {
@@ -69,27 +87,16 @@ export class IthinkFulfillmentService extends AbstractFulfillmentProviderService
     data: Record<string, unknown>,
     context: ValidateFulfillmentDataContext
   ): Promise<Record<string, unknown>> {
-    const postalCode = context.shipping_address?.postal_code
-    if (!postalCode) {
-      return { ...optionData, ...data }
-    }
-    const serviceable = await this.client.checkPincode(postalCode)
-    if (!serviceable) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        `Pincode ${postalCode} is not serviceable by iThink couriers`
-      )
-    }
-    const dimensions = shipmentDimensions(context.items, this.options)
-    return {
-      ...optionData,
-      ...data,
-      to_pincode: postalCode,
-      weight_kg: totalWeightKg(context.items, this.options),
-      shipment_length_cm: dimensions.lengthCm,
-      shipment_width_cm: dimensions.widthCm,
-      shipment_height_cm: dimensions.heightCm,
-    }
+    return validateWithRates(
+      {
+        client: this.client,
+        logger: this.logger,
+        options: this.options,
+      },
+      optionData,
+      data,
+      context
+    )
   }
 
   async calculatePrice(
@@ -151,36 +158,70 @@ export class IthinkFulfillmentService extends AbstractFulfillmentProviderService
         "iThink requires a shipping address to create a shipment"
       )
     }
-    const address = order.shipping_address
-    const dimensions = shipmentDimensionsForOrder(data, this.options)
-    const params: AddOrderParams = {
-      orderNumber: String(order.display_id ?? order.id ?? "medusa-order"),
-      orderDate: toOrderDate(order.created_at ?? new Date()),
-      totalAmount: toNumber(order.subtotal ?? order.item_subtotal ?? order.total ?? 0),
-      recipientName: recipientName(address),
-      addressLine1: address.address_1 ?? "",
-      addressLine2: address.address_2,
-      pin: address.postal_code ?? "",
-      city: address.city,
-      state: address.province,
-      country: address.country_code,
-      phone: address.phone ?? "",
-      email: order.email,
-      paymentMode: "Prepaid",
-      shipmentLengthCm: dimensions.lengthCm,
-      shipmentWidthCm: dimensions.widthCm,
-      shipmentHeightCm: dimensions.heightCm,
-      weightKg: numberValue(data.weight_kg) ?? this.options.default_weight_kg ?? DEFAULT_WEIGHT_KG,
-      lines: items.map((item) => ({
-        name: item.title ?? item.sku ?? "Product",
-        sku: item.sku,
-        quantity: item.quantity ?? 0,
-        price: priceForItem(item, order),
-      })),
-      pickupAddressId: this.options.pickup_address_id,
-      gstNumber: this.options.gst_number,
-      logistics: optionLogisticName(data),
+    const existingRefnum = stringValue(data.refnum)
+    if (existingRefnum) {
+      this.logger.info(
+        `iThink fulfillment already registered (refnum ${existingRefnum}); skipping iThink API call`
+      )
+      return { data: { ...data }, labels: [] }
     }
+    return this.getMode() === "dashboard"
+      ? this.syncToDashboard(data, items, order)
+      : this.bookShipment(data, items, order)
+  }
+
+  private async syncToDashboard(
+    data: Record<string, unknown>,
+    items: Partial<Omit<FulfillmentItemDTO, "fulfillment">>[],
+    order: Partial<FulfillmentOrderDTO>
+  ): Promise<CreateFulfillmentResult> {
+    if (!this.options.return_address_id) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        "iThink dashboard mode requires the return_address_id provider option"
+      )
+    }
+    const orderNo = `${this.options.order_no_prefix}${order.display_id ?? order.id}`
+    const params = buildOrderParams({
+      data,
+      items,
+      order,
+      options: this.options,
+      orderNumber: orderNo,
+    })
+    const [refnum] = await this.client.syncOrders([params])
+    if (!refnum) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        "iThink did not return a refnum for the synced order"
+      )
+    }
+    this.logger.info(`iThink order synced to dashboard: refnum ${refnum} for order ${orderNo}`)
+    return {
+      data: {
+        provider: "ithink",
+        mode: "dashboard",
+        refnum,
+        order_no: orderNo,
+        synced_at: new Date().toISOString(),
+      },
+      labels: [],
+    }
+  }
+
+  private async bookShipment(
+    data: Record<string, unknown>,
+    items: Partial<Omit<FulfillmentItemDTO, "fulfillment">>[],
+    order: Partial<FulfillmentOrderDTO>
+  ): Promise<CreateFulfillmentResult> {
+    const params = buildOrderParams({
+      data,
+      items,
+      order,
+      options: this.options,
+      orderNumber: String(order.display_id ?? order.id ?? "medusa-order"),
+      logistics: optionLogisticName(data),
+    })
     const result = await this.client.addOrder(params)
     const trackingUrl = result.tracking_url ?? ""
     this.logger.info(
@@ -207,10 +248,10 @@ export class IthinkFulfillmentService extends AbstractFulfillmentProviderService
   async cancelFulfillment(data: Record<string, unknown>): Promise<Record<string, unknown>> {
     const awb = stringValue(data.awb)
     if (!awb) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        "Cannot cancel an iThink shipment without an AWB"
+      this.logger.info(
+        "iThink shipment has no AWB; cancel it in the iThink dashboard (no API call)"
       )
+      return { cancelled: false, reason: "cancel-in-dashboard" }
     }
     return this.client.cancelOrder([awb])
   }

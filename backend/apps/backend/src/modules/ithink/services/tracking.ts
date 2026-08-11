@@ -15,6 +15,49 @@ export function isTerminalStatusCode(code: string | undefined): boolean {
   return typeof code === "string" && TERMINAL_STATUS_CODES.has(code.trim())
 }
 
+// Statuses that count as "shipped": the shipment is no longer pending and has
+// left the warehouse or is on its way. Mirrors the iThink dashboard status
+// vocabulary returned by get_details/track. DL is the delivered code.
+export const ACTIVE_STATUS_STRINGS = new Set([
+  "Manifested",
+  "Picked Up",
+  "In Transit",
+  "Out For Delivery",
+  "Delivered",
+])
+
+// Human-readable terminal strings, mirroring the code set above.
+export const TERMINAL_STATUS_STRINGS = new Set([
+  "Cancelled",
+  "Cancel",
+  "Lost",
+  "Shortage",
+  "RTO",
+  "RTO Shortage",
+  "RTO Delivered",
+])
+
+export type IthinkStatus = {
+  status?: string
+  statusCode?: string
+}
+
+export function isActive(status: IthinkStatus): boolean {
+  return status.statusCode === "DL" || ACTIVE_STATUS_STRINGS.has(status.status ?? "")
+}
+
+export function isDelivered(status: IthinkStatus): boolean {
+  return status.statusCode === "DL" || status.status === "Delivered"
+}
+
+export function isTerminal(status: IthinkStatus): boolean {
+  return (
+    isDelivered(status) ||
+    isTerminalStatusCode(status.statusCode) ||
+    TERMINAL_STATUS_STRINGS.has(status.status ?? "")
+  )
+}
+
 export type NormalizedScan = {
   status: string
   statusCode: string

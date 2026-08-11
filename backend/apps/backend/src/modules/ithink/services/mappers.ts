@@ -4,8 +4,9 @@ import type {
   FulfillmentOption,
   FulfillmentOrderDTO,
 } from "@medusajs/framework/types"
+import { MedusaError } from "@medusajs/framework/utils"
 import { toNumber } from "../clients/payloads"
-import type { IthinkClientOptions } from "../clients/types"
+import type { IthinkClientOptions, IthinkMode } from "../clients/types"
 
 export type IthinkProviderOptions = {
   base_url: string
@@ -17,6 +18,10 @@ export type IthinkProviderOptions = {
   default_width_cm?: number
   default_height_cm?: number
   gst_number?: string
+  mode?: IthinkMode
+  return_address_id?: string
+  order_no_prefix?: string
+  poll_enabled?: boolean
 }
 
 export const CARRIER_OPTIONS: FulfillmentOption[] = [
@@ -30,27 +35,20 @@ export const CARRIER_OPTIONS: FulfillmentOption[] = [
 export const DEFAULT_WEIGHT_KG = 0.5
 export const DEFAULT_DIMENSIONS_CM = { length: 20, width: 15, height: 10 }
 
-export function providerOptionsFromEnv(
-  env: NodeJS.ProcessEnv = process.env
-): IthinkProviderOptions | null {
-  const base_url = env.ITHINK_BASE_URL
-  const access_token = env.ITHINK_ACCESS_TOKEN
-  const secret_key = env.ITHINK_SECRET_KEY
-  const pickup_address_id = env.ITHINK_PICKUP_ADDRESS_ID
-  if (!base_url || !access_token || !secret_key || !pickup_address_id) {
-    return null
+export function resolveProviderOptions(options: IthinkProviderOptions): IthinkProviderOptions {
+  const mode = options.mode ?? "dashboard"
+  if (mode !== "dashboard" && mode !== "book") {
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      `Invalid iThink provider mode "${String(mode)}"; expected "dashboard" or "book"`
+    )
   }
-  const options: IthinkProviderOptions = { base_url, access_token, secret_key, pickup_address_id }
-  if (env.ITHINK_DEFAULT_WEIGHT_KG) {
-    const value = Number(env.ITHINK_DEFAULT_WEIGHT_KG)
-    if (Number.isFinite(value)) {
-      options.default_weight_kg = value
-    }
+  return {
+    ...options,
+    mode,
+    order_no_prefix: options.order_no_prefix ?? "",
+    poll_enabled: options.poll_enabled ?? true,
   }
-  if (env.ITHINK_GST_NUMBER) {
-    options.gst_number = env.ITHINK_GST_NUMBER
-  }
-  return options
 }
 
 export function toClientOptions(options: IthinkProviderOptions): IthinkClientOptions {
@@ -63,6 +61,10 @@ export function toClientOptions(options: IthinkProviderOptions): IthinkClientOpt
     defaultLengthCm: options.default_length_cm ?? DEFAULT_DIMENSIONS_CM.length,
     defaultWidthCm: options.default_width_cm ?? DEFAULT_DIMENSIONS_CM.width,
     defaultHeightCm: options.default_height_cm ?? DEFAULT_DIMENSIONS_CM.height,
+    mode: options.mode ?? "dashboard",
+    returnAddressId: options.return_address_id,
+    orderNoPrefix: options.order_no_prefix ?? "",
+    pollEnabled: options.poll_enabled ?? true,
   }
 }
 

@@ -11,7 +11,11 @@ function makeArgs(container: Record<string, unknown>): SubscriberArgs<{ id: stri
   }
 }
 
-function makeContainer(orderData: OrderData[], preorderVariants: unknown[] = []) {
+function makeContainer(
+  orderData: OrderData[],
+  ithinkProvider?: { getMode: () => unknown },
+  preorderVariants: unknown[] = []
+) {
   const deps = {
     logger: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
     query: {
@@ -23,6 +27,7 @@ function makeContainer(orderData: OrderData[], preorderVariants: unknown[] = [])
     preorder: {
       listPreorderVariants: jest.fn().mockResolvedValue(preorderVariants),
     },
+    ...(ithinkProvider ? { fp_ithink_ithink: ithinkProvider } : {}),
   }
   const container = {
     resolve: (key: string): unknown => deps[key as keyof typeof deps],
@@ -136,6 +141,102 @@ describe("order.placed subscriber (iThink registration)", () => {
     expect(deps.logger.warn).toHaveBeenCalledWith(expect.stringContaining("not found"))
   })
 
+  it("skips auto-submit when the provider mode is dashboard", async () => {
+    const { deps, container } = makeContainer(
+      [
+        {
+          payment_collections: [{ status: "captured" }],
+          fulfillments: [],
+          items: [{ id: "orli_1", quantity: 1 }],
+        },
+      ],
+      { getMode: () => "dashboard" }
+    )
+
+    await registerOrderWithIthinkHandler(makeArgs(container))
+
+    expect(deps.createOrderFulfillmentWorkflow).not.toHaveBeenCalled()
+    expect(deps.logger.info).toHaveBeenCalledWith(
+      "auto-submit disabled in dashboard mode; create fulfillment in admin to sync"
+    )
+  })
+
+  it("runs auto-submit when the provider mode is book", async () => {
+    const { deps, container } = makeContainer(
+      [
+        {
+          payment_collections: [{ status: "captured" }],
+          fulfillments: [],
+          items: [{ id: "orli_1", quantity: 1 }],
+        },
+      ],
+      { getMode: () => "book" }
+    )
+
+    await registerOrderWithIthinkHandler(makeArgs(container))
+
+    expect(deps.createOrderFulfillmentWorkflow).toHaveBeenCalledTimes(1)
+  })
+
+  it("runs auto-submit when the provider cannot be resolved", async () => {
+    const deps = {
+      logger: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
+      query: {
+        graph: jest.fn().mockResolvedValue({
+          data: [
+            {
+              payment_collections: [{ status: "captured" }],
+              fulfillments: [],
+              items: [{ id: "orli_1", quantity: 1 }],
+            },
+          ],
+        }),
+      },
+      createOrderFulfillmentWorkflow: jest
+        .fn()
+        .mockReturnValue({ run: jest.fn().mockResolvedValue({ result: { id: "ful_1" } }) }),
+    }
+    const container = {
+      resolve: (key: string): unknown => {
+        if (key.startsWith("fp_")) {
+          throw new Error(`provider ${key} not registered`)
+        }
+        return deps[key as keyof typeof deps]
+      },
+    } as unknown as Record<string, unknown>
+
+    await registerOrderWithIthinkHandler(makeArgs(container))
+
+    expect(deps.createOrderFulfillmentWorkflow).toHaveBeenCalledTimes(1)
+    expect(deps.logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining("iThink fulfillment provider")
+    )
+  })
+
+  it("runs auto-submit when getMode throws", async () => {
+    const { deps, container } = makeContainer(
+      [
+        {
+          payment_collections: [{ status: "captured" }],
+          fulfillments: [],
+          items: [{ id: "orli_1", quantity: 1 }],
+        },
+      ],
+      {
+        getMode: () => {
+          throw new Error("mode check failed")
+        },
+      }
+    )
+
+    await registerOrderWithIthinkHandler(makeArgs(container))
+
+    expect(deps.createOrderFulfillmentWorkflow).toHaveBeenCalledTimes(1)
+    expect(deps.logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining("iThink fulfillment provider")
+    )
+  })
+
   it("skips iThink registration when the order contains a pre-order variant", async () => {
     const { deps, container } = makeContainer(
       [
@@ -145,6 +246,7 @@ describe("order.placed subscriber (iThink registration)", () => {
           items: [{ id: "orli_1", quantity: 1, variant_id: "variant_1" }],
         },
       ],
+      undefined,
       [{ id: "pov_1", variant_id: "variant_1", status: "enabled" }]
     )
 

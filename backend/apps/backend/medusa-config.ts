@@ -2,6 +2,22 @@ import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
+// iThink provider options derived from env. Config scope has no logger, so
+// boot-time warnings go to stdout, which Medusa prints into the boot logs
+// (visible via `docker compose logs medusa`).
+const ithinkMode = process.env.ITHINK_MODE ?? "dashboard"
+const ithinkReturnAddressId = process.env.ITHINK_RETURN_ADDRESS_ID
+if (ithinkMode === "dashboard" && !ithinkReturnAddressId) {
+  console.warn(
+    '[ithink] ITHINK_MODE is "dashboard" but ITHINK_RETURN_ADDRESS_ID is not set; dashboard-mode createFulfillment will throw until a return address is configured'
+  )
+}
+const ithinkDefaultWeightKg = Number(process.env.ITHINK_DEFAULT_WEIGHT_KG ?? "")
+const ithinkWeightOption =
+  Number.isFinite(ithinkDefaultWeightKg) && ithinkDefaultWeightKg > 0
+    ? ithinkDefaultWeightKg
+    : undefined
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -83,6 +99,8 @@ module.exports = defineConfig({
             // under src/modules/ithink. Requires ITHINK_BASE_URL/ACCESS_TOKEN/
             // SECRET_KEY/PICKUP_ADDRESS_ID to reach the API; without them the
             // provider still boots, and checkout surfaces readable errors.
+            // ITHINK_RETURN_ADDRESS_ID is required at runtime in dashboard
+            // mode (the default); a boot warning is printed when it is missing.
             resolve: "./src/modules/ithink",
             id: "ithink",
             options: {
@@ -91,6 +109,11 @@ module.exports = defineConfig({
               secret_key: process.env.ITHINK_SECRET_KEY,
               pickup_address_id: process.env.ITHINK_PICKUP_ADDRESS_ID,
               gst_number: process.env.ITHINK_GST_NUMBER,
+              default_weight_kg: ithinkWeightOption,
+              mode: ithinkMode,
+              return_address_id: ithinkReturnAddressId,
+              order_no_prefix: process.env.ITHINK_ORDER_NO_PREFIX ?? "",
+              poll_enabled: process.env.ITHINK_POLL_ENABLED !== "false",
             },
           },
         ],

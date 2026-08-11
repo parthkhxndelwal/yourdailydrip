@@ -99,7 +99,12 @@ Fill `backend/.env` with real values:
 | `RAZORPAY_ID`, `RAZORPAY_SECRET` | Razorpay dashboard > Settings > API Keys (test mode) |
 | `RAZORPAY_ACCOUNT` | Razorpay dashboard > Settings > Account Details |
 | `RAZORPAY_WEBHOOK_SECRET` | Razorpay dashboard > Settings > Webhooks (create one for the URL in step 7) |
-| `ITHINK_*` | iThink team (staging); `ITHINK_BASE_URL=https://pre-alpha.ithinklogistics.com/api_v3` |
+| `ITHINK_BASE_URL`, `ITHINK_ACCESS_TOKEN`, `ITHINK_SECRET_KEY`, `ITHINK_PICKUP_ADDRESS_ID` | iThink team (staging); `ITHINK_BASE_URL=https://pre-alpha.ithinklogistics.com/api_v3` |
+| `ITHINK_MODE` | `dashboard` (default) or `book` (legacy auto-booking). Omit for dashboard mode. |
+| `ITHINK_RETURN_ADDRESS_ID` | iThink dashboard > add a return address. **REQUIRED in dashboard mode** - `createFulfillment` throws until set. |
+| `ITHINK_ORDER_NO_PREFIX` | Optional prefix for the iThink `order_no` (e.g. `YDD-` -> `YDD-42`). |
+| `ITHINK_POLL_ENABLED` | `true` (default). Set `false` to disable the reconciliation job (single-replica setups: keep `true`). |
+| `ITHINK_TRACK_BASE_URL` | Optional override for the track.json base URL. iThink docs list the prod track host inconsistently (`api.ithinklogistics.com` vs `my.ithinklogistics.com`); set this if prod tracking requests fail after cutover. Defaults to `ITHINK_BASE_URL`. |
 | `STORE_CORS` / `AUTH_CORS` | `https://yourdailydrip.com,https://<preview-subdomain>.workers.dev,http://localhost:5173` (see CORS section) |
 | `ADMIN_CORS` | `https://api.yourdailydrip.com,http://localhost:9000` |
 
@@ -163,8 +168,15 @@ $P npx medusa user -e admin@yourdailydrip.com -p '<strong-password>'
 
 # 4. iThink env (backend/.env): ITHINK_BASE_URL/ACCESS_TOKEN/SECRET_KEY/
 #    PICKUP_ADDRESS_ID/GST_NUMBER — without them calculated rates error at
-#    checkout. The India Warehouse postal code (from_pincode) is seeded as
-#    110006; update it if the pickup address changes.
+#    checkout. Dashboard mode (default) additionally requires
+#    ITHINK_RETURN_ADDRESS_ID (see the env table in step 4). The India
+#    Warehouse postal code (from_pincode) is seeded as 110006; update it if
+#    the pickup address changes.
+#
+#    The dashboard-mode rollout (ITHINK_MODE=dashboard + the new iThink env
+#    vars) is METADATA-ONLY - all state lives in fulfillment.data/metadata
+#    JSON, no new tables. db:migrate is NOT required for it; only run it for
+#    genuine schema changes (storefront bootstrap etc.).
 
 # 5. Razorpay webhook (Razorpay dashboard)
 #    URL: https://api.yourdailydrip.com/hooks/payment/razorpay_razorpay
@@ -242,6 +254,11 @@ docker compose -f docker-compose.prod.yml build
 docker compose -f docker-compose.prod.yml up -d
 docker compose -f docker-compose.prod.yml exec -T medusa npx medusa db:migrate
 ```
+
+> **iThink dashboard-mode deploys do NOT need `db:migrate`** - the change is
+> metadata only (fulfillment.data/metadata JSON, no new tables). Run
+> `db:migrate` in the upgrade flow only when the release contains real schema
+> changes (e.g. a future module migration).
 
 > If `npm install` changed the lockfile upstream, remember the razorpay
 > webhook-notes patch must be re-applied to `node_modules` (see

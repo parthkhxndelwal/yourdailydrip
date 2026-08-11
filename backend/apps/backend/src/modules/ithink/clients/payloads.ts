@@ -39,16 +39,19 @@ export function buildRateBody(params: RateCheckParams): Record<string, unknown> 
     shipping_weight_kg: params.weightKg,
     order_type: "forward",
     payment_method: "Prepaid",
-    product_mrp: params.productMrp,
   }
+  if (params.productMrp !== undefined) body.product_mrp = params.productMrp
   if (params.lengthCm !== undefined) body.shipping_length_cms = String(params.lengthCm)
   if (params.widthCm !== undefined) body.shipping_width_cms = String(params.widthCm)
   if (params.heightCm !== undefined) body.shipping_height_cms = String(params.heightCm)
   return body
 }
 
-export function buildOrderBody(params: AddOrderParams): Record<string, unknown> {
-  const shipment: Record<string, unknown> = {
+function shipmentBody(
+  params: AddOrderParams,
+  options?: { returnAddressId?: string }
+): Record<string, unknown> {
+  return {
     waybill: "",
     order: params.orderNumber,
     sub_order: "",
@@ -95,10 +98,16 @@ export function buildOrderBody(params: AddOrderParams): Record<string, unknown> 
     gst_number: params.gstNumber ?? "",
     eway_bill_number: "",
     payment_mode: params.paymentMode,
-    return_address_id: "",
+    return_address_id: options?.returnAddressId ?? "",
   }
+}
+
+export function buildOrderBody(
+  params: AddOrderParams,
+  options?: { returnAddressId?: string }
+): Record<string, unknown> {
   const data: Record<string, unknown> = {
-    shipments: [shipment],
+    shipments: [shipmentBody(params, options)],
     pickup_address_id: params.pickupAddressId,
     s_type: "",
     order_type: "",
@@ -107,6 +116,29 @@ export function buildOrderBody(params: AddOrderParams): Record<string, unknown> 
     data.logistics = params.logistics
   }
   return data
+}
+
+// order/sync.json mirrors order/add.json but never books the shipment: the
+// order lands in the iThink Store Order tab unbooked (no AWB), so there is no
+// `logistics` key and no waybill in the response.
+export function buildSyncOrderBody(
+  orderData: AddOrderParams | AddOrderParams[],
+  options: IthinkClientOptions
+): Record<string, unknown> {
+  const orders = Array.isArray(orderData) ? orderData : [orderData]
+  return {
+    shipments: orders.map((order) => shipmentBody(order, options)),
+    pickup_address_id: orders[0]?.pickupAddressId ?? options.pickupAddressId,
+    s_type: "",
+    order_type: "",
+  }
+}
+
+// order/get_details.json looks up a comma-separated list of order numbers in
+// the `order_no` key (its `order_no_list` sibling belongs to the separate
+// store/get-order-details.json endpoint which requires a platform_id).
+export function buildGetDetailsBody(orderNos: string[]): Record<string, unknown> {
+  return { order_no: orderNos.join(",") }
 }
 
 export function withAuth(

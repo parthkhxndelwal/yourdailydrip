@@ -57,11 +57,20 @@ services:
       RAZORPAY_SECRET: ${RAZORPAY_SECRET:?}
       RAZORPAY_ACCOUNT: ${RAZORPAY_ACCOUNT:?}
       RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:?}
-      # Optional - provider boots without these; checkout surfaces readable errors.
+      # Optional - provider boots without these; checkout surfaces readable
+      # errors. ITHINK_RETURN_ADDRESS_ID is required at runtime in dashboard
+      # mode (the default): createFulfillment throws until it is set.
       ITHINK_BASE_URL: ${ITHINK_BASE_URL:-}
       ITHINK_ACCESS_TOKEN: ${ITHINK_ACCESS_TOKEN:-}
       ITHINK_SECRET_KEY: ${ITHINK_SECRET_KEY:-}
       ITHINK_PICKUP_ADDRESS_ID: ${ITHINK_PICKUP_ADDRESS_ID:-}
+      ITHINK_GST_NUMBER: ${ITHINK_GST_NUMBER:-}
+      ITHINK_RETURN_ADDRESS_ID: ${ITHINK_RETURN_ADDRESS_ID:-}
+      ITHINK_MODE: ${ITHINK_MODE:-dashboard}
+      ITHINK_ORDER_NO_PREFIX: ${ITHINK_ORDER_NO_PREFIX:-}
+      ITHINK_POLL_ENABLED: ${ITHINK_POLL_ENABLED:-true}
+      ITHINK_DEFAULT_WEIGHT_KG: ${ITHINK_DEFAULT_WEIGHT_KG:-}
+      ITHINK_TRACK_BASE_URL: ${ITHINK_TRACK_BASE_URL:-}
       # Required - the file-s3 provider (Cloudflare R2) will not boot without them.
       S3_ENDPOINT: ${S3_ENDPOINT:?}
       S3_BUCKET: ${S3_BUCKET:?}
