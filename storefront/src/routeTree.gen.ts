@@ -24,6 +24,7 @@ import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ShippingPolicyRouteImport } from './routes/shipping-policy'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SkinCareRouteImport } from './routes/skin-care'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
@@ -103,6 +104,11 @@ const SkinCareRoute = SkinCareRouteImport.update({
   path: '/skin-care',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrackOrderRoute = TrackOrderRouteImport.update({
   id: '/track-order',
   path: '/track-order',
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/shipping-policy': typeof ShippingPolicyRoute
   '/shop': typeof ShopRoute
   '/skin-care': typeof SkinCareRoute
+  '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/wishlist': typeof WishlistRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/shipping-policy': typeof ShippingPolicyRoute
   '/shop': typeof ShopRoute
   '/skin-care': typeof SkinCareRoute
+  '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/wishlist': typeof WishlistRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/shipping-policy': typeof ShippingPolicyRoute
   '/shop': typeof ShopRoute
   '/skin-care': typeof SkinCareRoute
+  '/terms': typeof TermsRoute
   '/track-order': typeof TrackOrderRoute
   '/wishlist': typeof WishlistRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/shipping-policy'
     | '/shop'
     | '/skin-care'
+    | '/terms'
     | '/track-order'
     | '/wishlist'
     | '/product/$slug'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/shipping-policy'
     | '/shop'
     | '/skin-care'
+    | '/terms'
     | '/track-order'
     | '/wishlist'
     | '/product/$slug'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/shipping-policy'
     | '/shop'
     | '/skin-care'
+    | '/terms'
     | '/track-order'
     | '/wishlist'
     | '/product/$slug'
@@ -259,6 +271,7 @@ export interface RootRouteChildren {
   ShippingPolicyRoute: typeof ShippingPolicyRoute
   ShopRoute: typeof ShopRoute
   SkinCareRoute: typeof SkinCareRoute
+  TermsRoute: typeof TermsRoute
   TrackOrderRoute: typeof TrackOrderRoute
   WishlistRoute: typeof WishlistRoute
   ProductSlugRoute: typeof ProductSlugRoute
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SkinCareRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/track-order': {
       id: '/track-order'
       path: '/track-order'
@@ -411,6 +431,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShippingPolicyRoute: ShippingPolicyRoute,
   ShopRoute: ShopRoute,
   SkinCareRoute: SkinCareRoute,
+  TermsRoute: TermsRoute,
   TrackOrderRoute: TrackOrderRoute,
   WishlistRoute: WishlistRoute,
   ProductSlugRoute: ProductSlugRoute,

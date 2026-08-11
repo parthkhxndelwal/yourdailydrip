@@ -16,8 +16,10 @@
 // cart layer). Prices are as-is INR amounts (749 = 749) — never divide.
 //
 // The iThink AWB lives on fulfillment data (todo 11 stores it under
-// `fulfillment.data.awb`); `orderAwb()` reads it without reaching into the
-// backend, and the tracking snapshot for it is served by /track-order.
+// `fulfillment.data.awb`); `orderTrackingInfo()` reads it without reaching
+// into the backend, and the tracking snapshot for it is served by
+// /track-order. Fulfillments synced to the iThink dashboard but not yet
+// booked carry `fulfillment.data.refnum` instead — surfaced as pending.
 
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -29,9 +31,7 @@ import { hasAuthToken } from "./medusa-auth";
 
 export type StoreOrder = Awaited<ReturnType<typeof sdk.store.order.retrieve>>["order"];
 
-export type StoreOrderListItem = Awaited<
-  ReturnType<typeof sdk.store.order.list>
->["orders"][number];
+export type StoreOrderListItem = Awaited<ReturnType<typeof sdk.store.order.list>>["orders"][number];
 
 // Fields requested on every single-order retrieve: all scalar fields plus the
 // relations the confirmation page renders (items for lines, shipping address,
@@ -105,6 +105,33 @@ export function useCustomerOrders() {
 
 // ── Pure helpers ────────────────────────────────────────────────────────────
 
+export type OrderTracking = {
+  awb?: string;
+  refnum?: string;
+  pending: boolean;
+};
+
+/**
+ * The iThink shipment state for an order, read from the first fulfillment
+ * that carries any tracking data: an AWB (waybill) when the courier has been
+ * assigned, or — for dashboard-synced fulfillments awaiting dispatch — the
+ * iThink `refnum` with `pending: true`. Returns an empty object when no
+ * shipment exists yet.
+ */
+export function orderTrackingInfo(order: StoreOrder | StoreOrderListItem): OrderTracking {
+  for (const fulfillment of order.fulfillments ?? []) {
+    const data = fulfillment.data;
+    const dataAwb = data && typeof data.awb === "string" ? data.awb : "";
+    if (dataAwb.length > 0) return { awb: dataAwb, pending: false };
+    const metadata = fulfillment.metadata;
+    const metaAwb = metadata && typeof metadata.awb === "string" ? metadata.awb : "";
+    if (metaAwb.length > 0) return { awb: metaAwb, pending: false };
+    const refnum = data && typeof data.refnum === "string" ? data.refnum : "";
+    if (refnum.length > 0) return { refnum, pending: true };
+  }
+  return { pending: false };
+}
+
 /**
  * The iThink AWB (waybill) for an order, read from the first fulfillment that
  * carries one. Todo 11 stores the waybill under `fulfillment.data.awb`;
@@ -113,15 +140,7 @@ export function useCustomerOrders() {
  * your order ships" copy instead of fabricating one.
  */
 export function orderAwb(order: StoreOrder | StoreOrderListItem): string | undefined {
-  for (const fulfillment of order.fulfillments ?? []) {
-    const data = fulfillment.data;
-    const dataAwb = data && typeof data.awb === "string" ? data.awb : "";
-    if (dataAwb.length > 0) return dataAwb;
-    const metadata = fulfillment.metadata;
-    const metaAwb = metadata && typeof metadata.awb === "string" ? metadata.awb : "";
-    if (metaAwb.length > 0) return metaAwb;
-  }
-  return undefined;
+  return orderTrackingInfo(order).awb;
 }
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {

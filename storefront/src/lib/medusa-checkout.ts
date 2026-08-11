@@ -56,27 +56,128 @@ export function isIthinkShippingOption(option: StoreShippingOption): boolean {
  * order after them. This only reorders what the server returned — it never
  * invents prices or options.
  */
-export function prioritizeShippingOptions(
-  options: StoreShippingOption[],
-): StoreShippingOption[] {
-  const ithink = options
-    .filter(isIthinkShippingOption)
-    .sort((a, b) => a.amount - b.amount);
+export function prioritizeShippingOptions(options: StoreShippingOption[]): StoreShippingOption[] {
+  const ithink = options.filter(isIthinkShippingOption).sort((a, b) => a.amount - b.amount);
   const others = options.filter((option) => !isIthinkShippingOption(option));
   return [...ithink, ...others];
 }
 
+export type StoreShippingMethod = NonNullable<
+  Awaited<ReturnType<typeof sdk.store.cart.retrieve>>["cart"]["shipping_methods"]
+>[number];
+
 /**
- * Logistic detail line for an option (delivery TAT / carrier from the option
- * data) — rendered only when the server returned it, never fabricated.
+ * Logistic detail line for the selected shipping method (delivery TAT /
+ * expected delivery date / carrier). `delivery_tat` and
+ * `expected_delivery_date` are read from the shipping method's data first —
+ * the fulfillment provider persists them there at validateFulfillmentData —
+ * falling back to the option's own data; `logistic_name` comes from the
+ * option data. Rendered only when present, never fabricated.
  */
-export function shippingOptionDetail(option: StoreShippingOption): string | null {
+export function shippingOptionDetail(
+  option: StoreShippingOption,
+  method?: StoreShippingMethod,
+): string | null {
   const parts: string[] = [];
-  const deliveryTat = optionDataString(option, "delivery_tat");
+  const deliveryTat =
+    dataString(method?.data, "delivery_tat") ?? optionDataString(option, "delivery_tat");
+  const expectedDeliveryDate =
+    dataString(method?.data, "expected_delivery_date") ??
+    optionDataString(option, "expected_delivery_date");
   const logisticName = optionDataString(option, "logistic_name");
   if (deliveryTat) parts.push(`Delivery in ${deliveryTat}`);
+  if (expectedDeliveryDate) parts.push(`Arrives by ${expectedDeliveryDate}`);
   if (logisticName) parts.push(`via ${logisticName}`);
   return parts.length > 0 ? parts.join(" · ") : null;
+}
+
+function dataString(data: unknown, key: string): string | undefined {
+  if (typeof data !== "object" || data === null) return undefined;
+  const value = (data as Record<string, unknown>)[key];
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+// ── iThink shipping rate hints ──────────────────────────────────────────────
+//
+// Mirror of GET /store/ithink/rates (backend/src/api/store/ithink/rates/
+// route.ts): the cheapest and fastest courier for a delivery pincode plus the
+// expected delivery date. Hints are informational only — the customer never
+// picks a courier; the dashboard decides at dispatch. On any backend failure
+// the route answers 502 { error: "rate_unavailable" } and the storefront
+// renders no hint: checkout must never block on this.
+
+export type ShippingRateHint = {
+  logistic: string;
+  rate: number;
+  delivery_tat?: string;
+};
+
+export type ShippingRateHints = {
+  cheapest: ShippingRateHint;
+  fastest: ShippingRateHint;
+  expected_delivery_date?: string;
+  currency: string;
+  from_pincode: string;
+  to_pincode: string;
+};
+
+/**
+ * Parse the /store/ithink/rates response into typed hints. Anything malformed
+ * (missing cheapest/fastest, non-number rate, ...) is treated as no hints
+ * (null) so the UI renders nothing instead of crashing.
+ */
+export function parseShippingRateHints(payload: unknown): ShippingRateHints | null {
+  if (typeof payload !== "object" || payload === null) return null;
+  const record = payload as Record<string, unknown>;
+  const cheapest = parseRateHint(record.cheapest);
+  const fastest = parseRateHint(record.fastest);
+  if (!cheapest || !fastest) return null;
+  return {
+    cheapest,
+    fastest,
+    expected_delivery_date: optionalString(record.expected_delivery_date),
+    currency: optionalString(record.currency) ?? "",
+    from_pincode: optionalString(record.from_pincode) ?? "",
+    to_pincode: optionalString(record.to_pincode) ?? "",
+  };
+}
+
+function parseRateHint(value: unknown): ShippingRateHint | null {
+  if (typeof value !== "object" || value === null) return null;
+  const record = value as Record<string, unknown>;
+  if (typeof record.logistic !== "string" || typeof record.rate !== "number") return null;
+  return {
+    logistic: record.logistic,
+    rate: record.rate,
+    delivery_tat: optionalString(record.delivery_tat),
+  };
+}
+
+function optionalString(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+/**
+ * Fetch the cheapest/fastest courier hints for a delivery pincode from the
+ * store rates route (through the shared SDK client, never raw fetch). Any
+ * failure — 502 rate_unavailable, 400, network — maps to null: hints are
+ * informational and checkout must proceed without them.
+ */
+export async function fetchShippingRateHints(
+  pincode: string,
+  productMrp?: number,
+): Promise<ShippingRateHints | null> {
+  try {
+    const payload = await sdk.client.fetch<unknown>("/store/ithink/rates", {
+      query: {
+        pincode,
+        ...(productMrp && productMrp > 0 ? { mrp: String(productMrp) } : {}),
+      },
+    });
+    return parseShippingRateHints(payload);
+  } catch {
+    return null;
+  }
 }
 
 // ── App-facing India shipping address form ───────────────────────────────────
@@ -152,15 +253,17 @@ export function toAddressPayload(address: ShippingAddressForm): AddressPayload {
 }
 
 /** One-line display of a saved cart/shipping address (e.g. the payment review). */
-export function formatAddressLine(address?: {
-  first_name?: string | null;
-  last_name?: string | null;
-  address_1?: string | null;
-  address_2?: string | null;
-  city?: string | null;
-  province?: string | null;
-  postal_code?: string | null;
-} | null): string {
+export function formatAddressLine(
+  address?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    address_1?: string | null;
+    address_2?: string | null;
+    city?: string | null;
+    province?: string | null;
+    postal_code?: string | null;
+  } | null,
+): string {
   if (!address) return "—";
   const parts = [
     [address.first_name, address.last_name].filter(Boolean).join(" "),

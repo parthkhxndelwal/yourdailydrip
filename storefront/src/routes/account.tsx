@@ -1,13 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageShell } from "@/components/PageShell";
 import { AddressesTab } from "@/components/account/AddressesTab";
+import { AuthSplitScreen } from "@/components/account/AuthSplitScreen";
 import { OrdersTab } from "@/components/account/OrdersTab";
 import {
   authErrorMessage,
@@ -90,61 +89,35 @@ function AccountPage() {
     });
   };
 
-  return (
+  const shell = (children: ReactNode) => (
     <PageShell
       eyebrow="Account"
       title="Sign in or create an account"
       intro="Save your wishlist, track orders and reorder your routine in two taps."
     >
-      {loading ? (
-        <div className="rounded-xl border border-border bg-card p-6">
-          <p className="text-muted-foreground">Loading your account…</p>
-        </div>
-      ) : customer ? (
-        <SignedInPanel customer={customer} onLogout={handleLogout} pending={logout.isPending} />
-      ) : (
-        <Tabs defaultValue="signin" className="rounded-xl border border-border bg-card p-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign in</TabsTrigger>
-            <TabsTrigger value="signup">Sign up</TabsTrigger>
-          </TabsList>
-          <TabsContent value="signin" className="mt-6">
-            <form className="space-y-4" onSubmit={handleSignIn}>
-              <div className="space-y-2">
-                <Label htmlFor="si-email">Email</Label>
-                <Input id="si-email" name="email" type="email" required placeholder="you@example.com" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="si-pass">Password</Label>
-                <Input id="si-pass" name="password" type="password" required placeholder="••••••••" />
-              </div>
-              <Button type="submit" className="w-full" disabled={login.isPending}>
-                {login.isPending ? "Signing in…" : "Sign in"}
-              </Button>
-            </form>
-          </TabsContent>
-          <TabsContent value="signup" className="mt-6">
-            <form className="space-y-4" onSubmit={handleSignUp}>
-              <div className="space-y-2">
-                <Label htmlFor="su-name">Full name</Label>
-                <Input id="su-name" name="name" required placeholder="Ananya Rao" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="su-email">Email</Label>
-                <Input id="su-email" name="email" type="email" required placeholder="you@example.com" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="su-pass">Create password</Label>
-                <Input id="su-pass" name="password" type="password" required minLength={8} placeholder="At least 8 characters" />
-              </div>
-              <Button type="submit" className="w-full" disabled={register.isPending}>
-                {register.isPending ? "Creating account…" : "Create account"}
-              </Button>
-            </form>
-          </TabsContent>
-        </Tabs>
-      )}
+      {children}
     </PageShell>
+  );
+
+  return (
+    <>
+      {loading ? (
+        shell(
+          <div className="rounded-xl border border-border bg-card p-6">
+            <p className="text-muted-foreground">Loading your account…</p>
+          </div>,
+        )
+      ) : customer ? (
+        shell(<SignedInPanel customer={customer} onLogout={handleLogout} pending={logout.isPending} />)
+      ) : (
+        <AuthSplitScreen
+          onSignIn={handleSignIn}
+          onSignUp={handleSignUp}
+          loginPending={login.isPending}
+          registerPending={register.isPending}
+        />
+      )}
+    </>
   );
 }
 

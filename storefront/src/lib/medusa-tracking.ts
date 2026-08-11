@@ -34,6 +34,38 @@ export type TrackShipment = {
   scans: TrackScan[];
 };
 
+// The backend answers 200 with this shape when the fulfillment is synced to
+// the iThink dashboard but not yet booked (no AWB): dashboard mode hands the
+// order to iThink first, and the waybill only appears after the courier
+// dispatches it. Mirror of the pending branch of GET /store/ithink/track.
+export type TrackPending = {
+  state: "pending";
+  refnum?: string;
+  order_no?: string;
+};
+
+export type TrackLookupResult = TrackShipment | TrackPending | null;
+
+/**
+ * Normalize the track route response into the storefront's three states:
+ * a pending shipment (synced, awaiting AWB), a full tracking snapshot, or
+ * null (no shipment). Anything malformed is treated as no shipment so the UI
+ * renders the friendly not-found state instead of crashing.
+ */
+export function parseTrackResponse(payload: unknown): TrackLookupResult {
+  if (typeof payload !== "object" || payload === null) return null;
+  const record = payload as Record<string, unknown>;
+  if (record.state === "pending") {
+    return {
+      state: "pending",
+      refnum: typeof record.refnum === "string" ? record.refnum : undefined,
+      order_no: typeof record.order_no === "string" ? record.order_no : undefined,
+    };
+  }
+  if (typeof record.awb !== "string" || !Array.isArray(record.scans)) return null;
+  return record as unknown as TrackShipment;
+}
+
 export const trackingKeys = {
   all: ["medusa", "tracking"] as const,
   detail: (awb: string) => ["medusa", "tracking", awb] as const,
@@ -47,13 +79,14 @@ export const trackingKeys = {
  */
 export function useTrackShipment(awb: string) {
   const normalized = awb.trim();
-  return useQuery<TrackShipment | null, Error>({
+  return useQuery<TrackLookupResult, Error>({
     queryKey: trackingKeys.detail(normalized),
     queryFn: async () => {
       try {
-        return await sdk.client.fetch<TrackShipment>("/store/ithink/track", {
+        const payload = await sdk.client.fetch<unknown>("/store/ithink/track", {
           query: { awb: normalized },
         });
+        return parseTrackResponse(payload);
       } catch (error) {
         if (isNotFoundError(error)) return null;
         throw error;

@@ -29,22 +29,18 @@ import { CheckoutSummary } from "@/components/checkout/CheckoutSummary";
 import { PaymentStep } from "@/components/checkout/PaymentStep";
 import { StepIndicator, type CheckoutStep } from "@/components/checkout/StepIndicator";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   useCreateAddress,
   useCustomerAddresses,
   toCreateAddressBody,
 } from "@/lib/medusa-addresses";
-import {
-  cartKeys,
-  clearCartId,
-  toCartLines,
-  useCart,
-  type StoreCart,
-} from "@/lib/medusa-cart";
+import { cartKeys, clearCartId, toCartLines, useCart, type StoreCart } from "@/lib/medusa-cart";
 import { sdk } from "@/lib/medusa";
 import { hasAuthToken, useCustomer } from "@/lib/medusa-auth";
 import { initiateRazorpaySession } from "@/lib/medusa-payment";
 import {
+  fetchShippingRateHints,
   toAddressPayload,
   type PlacedOrder,
   type ShippingAddressForm,
@@ -60,7 +56,10 @@ export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
       { title: "Checkout — Daily Drip" },
-      { name: "description", content: "Complete your Daily Drip order — address, shipping, payment and confirmation." },
+      {
+        name: "description",
+        content: "Complete your Daily Drip order — address, shipping, payment and confirmation.",
+      },
       { property: "og:title", content: "Checkout — Daily Drip" },
       { property: "og:description", content: "Complete your Daily Drip order." },
     ],
@@ -114,7 +113,11 @@ function CheckoutPage() {
 
   if (loading) return <CheckoutShell>Loading your cart…</CheckoutShell>;
   if (cartQuery.isError || !cart || toCartLines(cart).length === 0) {
-    return <CheckoutShell><CheckoutEmpty error={cartQuery.isError} /></CheckoutShell>;
+    return (
+      <CheckoutShell>
+        <CheckoutEmpty error={cartQuery.isError} />
+      </CheckoutShell>
+    );
   }
 
   return (
@@ -163,11 +166,22 @@ function CheckoutFlow({
   const shippingDone = (cart.shipping_methods?.length ?? 0) > 0;
   const shippingAmount = shippingDone ? (cart.shipping_total ?? 0) : 0;
 
-  const updateAddress = useMutation<
-    void,
-    Error,
-    { email: string; address: ShippingAddressForm }
-  >({
+  // iThink rate hints for the delivery pincode on the cart (persisted when the
+  // address step submits). Purely informational — cheapest/fastest courier +
+  // expected delivery date — and non-blocking: the query is disabled without a
+  // valid 6-digit pincode, retries nothing, and any backend failure maps to
+  // null inside fetchShippingRateHints, so checkout proceeds regardless.
+  const deliveryPincode = cart.shipping_address?.postal_code?.trim() ?? "";
+  const cartMrp = typeof cart.item_total === "number" && cart.item_total > 0 ? cart.item_total : undefined;
+  const hintsQuery = useQuery({
+    queryKey: ["medusa", "ithink", "rate-hints", deliveryPincode, cartMrp ?? "no-mrp"],
+    queryFn: () => fetchShippingRateHints(deliveryPincode, cartMrp),
+    enabled: /^\d{6}$/.test(deliveryPincode),
+    staleTime: 60_000,
+    retry: false,
+  });
+
+  const updateAddress = useMutation<void, Error, { email: string; address: ShippingAddressForm }>({
     mutationFn: async ({ email, address }) => {
       await sdk.store.cart.update(cartId, {
         email,
@@ -229,24 +243,46 @@ function CheckoutFlow({
         <StepIndicator current={step} />
 
         {step === "address" && (
-          <CheckoutAddressForm
-            defaultEmail={cart.email ?? customerQuery.data?.email ?? undefined}
-            defaultAddress={cart.shipping_address}
-            pending={updateAddress.isPending}
-            savedAddresses={addressesQuery.data}
-            signedIn={signedIn}
-            shippingError={shippingError}
-            onSaveAddress={(address) => {
-              createAddress.mutate(
-                toCreateAddressBody(address, cart.email ?? customerQuery.data?.email ?? ""),
-                {
-                  onError: () =>
-                    toast.error("Address saved for this order, but we couldn't save it to your account."),
-                },
-              );
-            }}
-            onSubmit={(email, address) => updateAddress.mutate({ email, address })}
-          />
+          <div className="space-y-4">
+            <CheckoutAddressForm
+              defaultEmail={cart.email ?? customerQuery.data?.email ?? undefined}
+              defaultAddress={cart.shipping_address}
+              pending={updateAddress.isPending}
+              savedAddresses={addressesQuery.data}
+              signedIn={signedIn}
+              shippingError={shippingError}
+              onSaveAddress={(address) => {
+                createAddress.mutate(
+                  toCreateAddressBody(address, cart.email ?? customerQuery.data?.email ?? ""),
+                  {
+                    onError: () =>
+                      toast.error(
+                        "Address saved for this order, but we couldn't save it to your account.",
+                      ),
+                  },
+                );
+              }}
+              onSubmit={(email, address) => updateAddress.mutate({ email, address })}
+            />
+            {mounted && hintsQuery.isPending && hintsQuery.fetchStatus !== "idle" && (
+              <div className="rounded-xl border border-border bg-card p-4">
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="mt-2 h-4 w-1/2" />
+              </div>
+            )}
+            {mounted && hintsQuery.data && (
+              <div className="rounded-xl border border-border bg-card p-4">
+                <p className="text-sm text-muted-foreground">
+                  Cheapest: {hintsQuery.data.cheapest.logistic} INR {hintsQuery.data.cheapest.rate}
+                  {hintsQuery.data.expected_delivery_date
+                    ? ` (est. ${hintsQuery.data.expected_delivery_date})`
+                    : ""}
+                  {" · "}Fastest: {hintsQuery.data.fastest.logistic} INR{" "}
+                  {hintsQuery.data.fastest.rate}
+                </p>
+              </div>
+            )}
+          </div>
         )}
 
         {step === "payment" && (
@@ -259,7 +295,11 @@ function CheckoutFlow({
         )}
       </div>
 
-      <CheckoutSummary lines={toCartLines(cart)} shippingAmount={shippingAmount} hasShipping={shippingDone} />
+      <CheckoutSummary
+        lines={toCartLines(cart)}
+        shippingAmount={shippingAmount}
+        hasShipping={shippingDone}
+      />
     </div>
   );
 }

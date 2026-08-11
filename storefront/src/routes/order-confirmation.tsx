@@ -19,7 +19,7 @@ import { PageShell } from "@/components/PageShell";
 import {
   formatOrderDate,
   fulfillmentStatusLabel,
-  orderAwb,
+  orderTrackingInfo,
   paymentStatusLabel,
   useOrder,
   type StoreOrder,
@@ -33,7 +33,10 @@ export const Route = createFileRoute("/order-confirmation")({
   head: () => ({
     meta: [
       { title: "Order Confirmation — Daily Drip" },
-      { name: "description", content: "Your Daily Drip order confirmation — items, totals and shipping tracking." },
+      {
+        name: "description",
+        content: "Your Daily Drip order confirmation — items, totals and shipping tracking.",
+      },
       { property: "og:title", content: "Order Confirmation — Daily Drip" },
       { property: "og:description", content: "Review your Daily Drip order confirmation." },
     ],
@@ -62,7 +65,11 @@ function OrderConfirmation() {
 
   if (loading) {
     return (
-      <PageShell eyebrow="Order" title="Loading your order…" intro="Pulling up your confirmation details.">
+      <PageShell
+        eyebrow="Order"
+        title="Loading your order…"
+        intro="Pulling up your confirmation details."
+      >
         <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm text-muted-foreground">Fetching your order…</p>
         </div>
@@ -72,11 +79,16 @@ function OrderConfirmation() {
 
   if (query.isError || !order) {
     return (
-      <PageShell eyebrow="Order" title="We couldn't find that order" intro="Double-check the link from your confirmation email and try again.">
+      <PageShell
+        eyebrow="Order"
+        title="We couldn't find that order"
+        intro="Double-check the link from your confirmation email and try again."
+      >
         <div className="rounded-xl border border-border bg-card p-10 text-center">
           <PackageSearch className="mx-auto text-muted-foreground" size={40} />
           <p className="mt-4 text-muted-foreground">
-            Something went wrong loading this order. If you just placed it, give it a moment and try again.
+            Something went wrong loading this order. If you just placed it, give it a moment and try
+            again.
           </p>
           <Button className="mt-6" asChild>
             <Link to="/">Back to home</Link>
@@ -189,26 +201,35 @@ function OrderTotals({ order }: { order: StoreOrder }) {
 }
 
 function TrackingSection({ order }: { order: StoreOrder }) {
-  const awb = orderAwb(order);
+  const tracking = orderTrackingInfo(order);
   return (
     <section className="rounded-xl border border-border bg-card p-6">
       <h2 className="text-lg">Tracking</h2>
-      {awb ? (
+      {tracking.awb ? (
         <div className="mt-4">
           <p className="text-sm text-muted-foreground">
-            Tracking number{" "}
-            <span className="font-medium text-foreground">{awb}</span>
+            Tracking number <span className="font-medium text-foreground">{tracking.awb}</span>
           </p>
           <Button className="mt-4" asChild>
-            <Link to="/track-order" search={{ awb }}>
+            <Link to="/track-order" search={{ awb: tracking.awb }}>
               Track your order
             </Link>
           </Button>
         </div>
+      ) : tracking.pending && tracking.refnum ? (
+        <div className="mt-4">
+          <p className="text-sm text-muted-foreground">
+            Order synced with logistics provider. Tracking AWB will appear once the courier
+            dispatches it.
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Reference number <span className="font-medium text-foreground">{tracking.refnum}</span>
+          </p>
+        </div>
       ) : (
         <p className="mt-4 text-sm text-muted-foreground">
-          Tracking will appear here once your shipment is created. We'll send
-          your AWB by email as soon as it's available.
+          Tracking will appear here once your shipment is created. We'll send your AWB by email as
+          soon as it's available.
         </p>
       )}
     </section>

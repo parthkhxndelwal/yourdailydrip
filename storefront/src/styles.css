@@ -21,9 +21,17 @@
 @theme inline {
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
+  --font-body: var(--font-body);
   --color-leaf: var(--leaf);
   --color-deep: var(--deep);
   --color-sand: var(--sand);
+  --color-forest: var(--forest);
+  --color-olive: var(--olive);
+  --color-sage: var(--sage);
+  --color-cream: var(--cream);
+  --color-cream-soft: var(--cream-soft);
+  --color-gold: var(--gold);
+  --color-charcoal: var(--charcoal);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -90,10 +98,17 @@
   --leaf: oklch(0.55 0.11 148);
   --deep: oklch(0.24 0.05 152);
   --sand: oklch(0.94 0.03 88);
-  --font-display: "Montserrat", system-ui, sans-serif;
-  --font-body: "Roboto", system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Manrope", system-ui, sans-serif;
   --gradient-forest: linear-gradient(140deg, oklch(0.28 0.06 152), oklch(0.42 0.09 150));
   --shadow-soft: 0 18px 45px -25px oklch(0.24 0.05 152 / 0.45);
+  --forest: #0B1710;
+  --olive: #18251A;
+  --sage: #B7C9A6;
+  --cream: #F7F4EC;
+  --cream-soft: #FAF9F5;
+  --gold: #C5A464;
+  --charcoal: #222B24;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);

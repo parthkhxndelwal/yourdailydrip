@@ -7,7 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageShell } from "@/components/PageShell";
-import { useTrackShipment, type TrackShipment } from "@/lib/medusa-tracking";
+import {
+  useTrackShipment,
+  type TrackLookupResult,
+  type TrackPending,
+  type TrackShipment,
+} from "@/lib/medusa-tracking";
 
 export const Route = createFileRoute("/track-order")({
   // Accept an optional `?awb=` search param (e.g. from /order-confirmation's
@@ -18,7 +23,11 @@ export const Route = createFileRoute("/track-order")({
   head: () => ({
     meta: [
       { title: "Track Your Order — Daily Drip" },
-      { name: "description", content: "Enter your Daily Drip tracking number (AWB) to see live shipping status and expected delivery date." },
+      {
+        name: "description",
+        content:
+          "Enter your Daily Drip tracking number (AWB) to see live shipping status and expected delivery date.",
+      },
       { property: "og:title", content: "Track Your Order — Daily Drip" },
       { property: "og:description", content: "Live shipping status for your Daily Drip order." },
     ],
@@ -37,6 +46,10 @@ function formatDateOnly(value?: string): string | undefined {
   const parsed = parse(value, "yyyy-MM-dd", new Date());
   if (Number.isNaN(parsed.getTime())) return value;
   return format(parsed, "d MMM yyyy");
+}
+
+function isTrackPending(shipment: TrackLookupResult): shipment is TrackPending {
+  return shipment !== null && "state" in shipment && shipment.state === "pending";
 }
 
 function ScanLine({ shipment }: { shipment: TrackShipment }) {
@@ -126,17 +139,32 @@ function TrackOrder() {
         <div className="rounded-xl border border-border bg-card p-6">
           <p className="font-medium text-foreground">No shipment found</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Double-check the tracking number and try again. If you just ordered,
-            tracking may take a little while to appear.
+            Double-check the tracking number and try again. If you just ordered, tracking may take a
+            little while to appear.
           </p>
         </div>
       )}
 
-      {shipment && (
+      {shipment && isTrackPending(shipment) && (
+        <div className="rounded-xl border border-border bg-card p-6">
+          <p className="font-medium text-foreground">Awaiting dispatch</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Order synced with logistics provider. Tracking AWB will appear once the courier
+            dispatches it.
+          </p>
+          {shipment.refnum && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Reference number{" "}
+              <span className="font-medium text-foreground">{shipment.refnum}</span>
+            </p>
+          )}
+        </div>
+      )}
+
+      {shipment && !isTrackPending(shipment) && (
         <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm text-muted-foreground">
-            Tracking number{" "}
-            <span className="font-medium text-foreground">{shipment.awb}</span>
+            Tracking number <span className="font-medium text-foreground">{shipment.awb}</span>
             {shipment.status && <> · {shipment.status}</>}
             {formatDateOnly(shipment.expectedDeliveryDate) && (
               <> · Expected {formatDateOnly(shipment.expectedDeliveryDate)}</>
@@ -147,8 +175,8 @@ function TrackOrder() {
       )}
 
       <p className="text-sm text-muted-foreground">
-        Tracking not updating? Write to care@dailydrip.in with your tracking number
-        and we'll respond within one working day.
+        Tracking not updating? Write to care@dailydrip.in with your tracking number and we'll
+        respond within one working day.
       </p>
     </PageShell>
   );

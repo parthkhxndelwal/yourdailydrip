@@ -93,14 +93,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Daily Drip — Clean Skin & Hair Care, Made in India" },
       {
         property: "og:description",
-        content: "Dermatologist-tested serums, cleansers, hair oils and masks with honest ingredient lists. Shipping rates calculated at checkout.",
+        content:
+          "Dermatologist-tested serums, cleansers, hair oils and masks with honest ingredient lists. Shipping rates calculated at checkout.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Daily Drip — Clean Skin & Hair Care, Made in India" },
-      { name: "twitter:description", content: "Dermatologist-tested serums, cleansers, hair oils and masks with honest ingredient lists. Shipping rates calculated at checkout." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3f9a74b8-cc3f-4d69-a7b0-4b4f913b81d7/id-preview-e278abf4--e61f20dd-3617-42c5-981f-ac74f39248cc.lovable.app-1785409613416.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3f9a74b8-cc3f-4d69-a7b0-4b4f913b81d7/id-preview-e278abf4--e61f20dd-3617-42c5-981f-ac74f39248cc.lovable.app-1785409613416.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Dermatologist-tested serums, cleansers, hair oils and masks with honest ingredient lists. Shipping rates calculated at checkout.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3f9a74b8-cc3f-4d69-a7b0-4b4f913b81d7/id-preview-e278abf4--e61f20dd-3617-42c5-981f-ac74f39248cc.lovable.app-1785409613416.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3f9a74b8-cc3f-4d69-a7b0-4b4f913b81d7/id-preview-e278abf4--e61f20dd-3617-42c5-981f-ac74f39248cc.lovable.app-1785409613416.png",
+      },
     ],
     links: [
       {
@@ -111,7 +124,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -142,6 +155,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ShopProvider>
+        {/* Global chrome — every page (including /) shares the same bar + header. */}
         <AnnouncementBar />
         <Header />
         <main className="min-h-[60vh]">
