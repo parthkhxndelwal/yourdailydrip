@@ -4,12 +4,17 @@ import { Modules } from "@medusajs/framework/utils"
 
 type AnnouncementBarConfig = {
   text: string
-  ends_at: string
+  ends_at: string | null
+  show_countdown: boolean
+  link: { label: string; url: string } | null
 }
 
 // The admin dashboard writes the top-bar config into the store entity's
 // metadata under `announcement_bar`. The storefront renders `text` plus a
-// countdown to `ends_at`. Defensive shape validation only - this is a read.
+// countdown to `ends_at` and an optional link. Legacy configs only carry
+// `{ text, ends_at }` - missing booleans fall back to their defaults
+// (show_countdown true, show_link false). Defensive shape validation
+// only - this is a read.
 function parseAnnouncementBar(
   metadata: Record<string, unknown> | null | undefined
 ): AnnouncementBarConfig | null {
@@ -26,10 +31,29 @@ function parseAnnouncementBar(
     return null
   }
   const endsAt = bar.ends_at
-  if (typeof endsAt !== "string" || Number.isNaN(new Date(endsAt).getTime())) {
-    return null
+  if (endsAt !== null) {
+    if (typeof endsAt !== "string" || Number.isNaN(new Date(endsAt).getTime())) {
+      return null
+    }
   }
-  return { text, ends_at: endsAt }
+  const showCountdown = bar.show_countdown
+  const linkLabel = bar.link_label
+  const linkUrl = bar.link_url
+  const showLink = bar.show_link === true
+  const link =
+    showLink &&
+    typeof linkLabel === "string" &&
+    linkLabel.trim().length > 0 &&
+    typeof linkUrl === "string" &&
+    linkUrl.trim().length > 0
+      ? { label: linkLabel, url: linkUrl }
+      : null
+  return {
+    text,
+    ends_at: endsAt ?? null,
+    show_countdown: typeof showCountdown === "boolean" ? showCountdown : true,
+    link,
+  }
 }
 
 // Public store route: announcement-bar config from the store entity's
@@ -52,5 +76,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   res.status(200).json({
     text: config ? config.text : null,
     ends_at: config ? config.ends_at : null,
+    show_countdown: config ? config.show_countdown : true,
+    link: config ? config.link : null,
   })
 }
