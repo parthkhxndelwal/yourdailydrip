@@ -4,14 +4,11 @@ import type { Logger } from "@medusajs/framework/types"
 import type { createOrderFulfillmentWorkflow } from "@medusajs/core-flows"
 import { PREORDER_MODULE } from "../modules/preorder"
 import { PreorderVariantStatus } from "../modules/preorder/models/preorder-variant"
-
-// Medusa v2 fulfillment providers are registered in the container under
-// `fp_<identifier>_<id>` (see @medusajs/fulfillment/dist/loaders/providers.js).
-// The ithink provider's static identifier is "ithink" and medusa-config.ts
-// registers it with id "ithink", so the key is "fp_ithink_ithink" (same shape
-// as the manual provider's "fp_manual_manual"). "fp_ithink" is a fallback for
-// installs that omit the provider id.
-const ITHINK_PROVIDER_KEYS = ["fp_ithink_ithink", "fp_ithink"] as const
+import {
+  ITHINK_PROVIDER_KEYS,
+  resolveIthinkProvider,
+  type ContainerLike,
+} from "../modules/ithink/services/reconciliation"
 
 type IthinkModeProvider = { getMode: () => "dashboard" | "book" }
 
@@ -21,18 +18,14 @@ type OrderFulfillmentContext = {
   items?: { id: string; quantity: number; variant_id?: string }[]
 }
 
-function resolveIthinkMode(
-  container: { resolve: (key: string) => unknown },
-  logger: Logger
-): "dashboard" | "book" | undefined {
-  for (const key of ITHINK_PROVIDER_KEYS) {
+function resolveIthinkMode(container: ContainerLike, logger: Logger): "dashboard" | "book" | undefined {
+  const provider = resolveIthinkProvider<IthinkModeProvider>(container)
+  if (provider?.getMode) {
     try {
-      const provider = container.resolve(key) as IthinkModeProvider | undefined
-      if (provider) {
-        return provider.getMode()
-      }
+      return provider.getMode()
     } catch {
-      // fall through to the next candidate key
+      // provider resolved but cannot report its mode; fall through to the
+      // warn + auto-submit path below
     }
   }
   logger.warn(

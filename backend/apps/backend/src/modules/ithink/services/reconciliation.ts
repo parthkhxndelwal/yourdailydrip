@@ -1,4 +1,4 @@
-import { FulfillmentEvents } from "@medusajs/framework/utils"
+import { FulfillmentEvents, Modules } from "@medusajs/framework/utils"
 import type { FulfillmentDTO, Logger } from "@medusajs/framework/types"
 import type { IthinkClient } from "../clients/ithink-client"
 import { toIthinkDateTime } from "../clients/payloads"
@@ -11,6 +11,51 @@ import { isActive, isDelivered } from "./tracking"
 // provider keys (fp_<identifier>_<id> with id "ithink", plus a fallback for
 // installs that omit the id). Same keys as the order-placed subscriber.
 export const ITHINK_PROVIDER_KEYS = ["fp_ithink_ithink", "fp_ithink"] as const
+
+export type ContainerLike = { resolve: (key: string) => unknown }
+
+// Medusa v2 registers fulfillment providers on the fulfillment module's
+// internal container, NOT the root container (see
+// @medusajs/fulfillment/dist/loaders/providers.js + load-internal.js). The
+// module service exposes that container as `__container__`, and Medusa's own
+// FulfillmentProviderService.retrieveProviderRegistration reads providers via
+// bracket property access (`this.__container__["fp_" + id]`) - never
+// .resolve(), because the internal container is a cradle proxy where
+// .resolve() itself is treated as a registration key. Root-container .resolve()
+// still works for tests and installs that register the provider on the root.
+export function resolveIthinkProvider<T = unknown>(container: ContainerLike): T | undefined {
+  for (const key of ITHINK_PROVIDER_KEYS) {
+    try {
+      const provider = container.resolve(key) as T | undefined
+      if (provider) {
+        return provider
+      }
+    } catch {
+      // fall through to the next candidate key
+    }
+  }
+  try {
+    const moduleService = container.resolve(Modules.FULFILLMENT) as {
+      __container__?: Record<string, unknown>
+    }
+    const internalContainer = moduleService.__container__
+    if (internalContainer) {
+      for (const key of ITHINK_PROVIDER_KEYS) {
+        try {
+          const provider = internalContainer[key] as T | undefined
+          if (provider) {
+            return provider
+          }
+        } catch {
+          // fall through to the next candidate key
+        }
+      }
+    }
+  } catch {
+    // no fulfillment module service in scope
+  }
+  return undefined
+}
 
 export const TRACKING_META_KEY = "ithink_tracking"
 export const TRACK_CHUNK_SIZE = 10
@@ -42,22 +87,11 @@ export type DiscoveryResult = {
 }
 
 export function providerFromContainer(
-  container: { resolve: (key: string) => unknown }
+  container: ContainerLike
 ): { getOptions: () => IthinkProviderOptions } | undefined {
-  for (const key of ITHINK_PROVIDER_KEYS) {
-    try {
-      const provider = container.resolve(key) as
-        | { getOptions?: () => IthinkProviderOptions }
-        | undefined
-      if (provider) {
-        const getOptions = provider.getOptions
-        if (typeof getOptions === "function") {
-          return { getOptions }
-        }
-      }
-    } catch {
-      // try the next registration key
-    }
+  const provider = resolveIthinkProvider<{ getOptions?: () => IthinkProviderOptions }>(container)
+  if (provider && typeof provider.getOptions === "function") {
+    return { getOptions: provider.getOptions }
   }
   return undefined
 }
