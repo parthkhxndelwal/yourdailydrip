@@ -3,18 +3,27 @@ import { Modules } from "@medusajs/framework/utils"
 import type { IthinkFulfillmentService } from "../../../../modules/ithink/services/ithink-fulfillment"
 import { rateSlots, tatDays } from "../../../../modules/ithink/services/fulfillment-validation"
 
-// Medusa v2 fulfillment providers are registered in the container under
-// `fp_<identifier>_<id>` (see @medusajs/fulfillment/dist/loaders/providers.js).
-// The ithink provider's static identifier is "ithink" and medusa-config.ts
-// registers it with id "ithink", so the key is "fp_ithink_ithink" ("fp_ithink"
-// is a fallback for installs that omit the provider id).
+// Medusa v2 fulfillment providers are registered on the fulfillment module's
+// internal container (a MedusaContainer) under `fp_<identifier>_<id>` (see
+// @medusajs/fulfillment/dist/loaders/providers.js). The module service exposes
+// that container as `__container__`, and Medusa's own
+// FulfillmentProviderService.retrieveProviderRegistration reads providers via
+// bracket property access (`this.__container__["fp_" + id]`), never .resolve()
+// (the container is a cradle proxy where .resolve() itself is treated as a
+// registration key). The ithink provider's static identifier is "ithink" and
+// medusa-config.ts registers it with id "ithink", so the key is
+// "fp_ithink_ithink" ("fp_ithink" is a fallback for installs that omit the id).
 const ITHINK_PROVIDER_KEYS = ["fp_ithink_ithink", "fp_ithink"] as const
 
 type RateHintsProvider = Pick<IthinkFulfillmentService, "getRateHints">
 
+type ScopeLike = { resolve: (key: string) => unknown }
+
 function resolveRateHintsProvider(
-  scope: { resolve: (key: string) => unknown }
+  scope: ScopeLike
 ): RateHintsProvider | undefined {
+  // Root-container lookup first (covers tests and installs that register the
+  // provider on the root container).
   for (const key of ITHINK_PROVIDER_KEYS) {
     try {
       const provider = scope.resolve(key) as RateHintsProvider | undefined
@@ -24,6 +33,28 @@ function resolveRateHintsProvider(
     } catch {
       // fall through to the next candidate key
     }
+  }
+  // Module-container lookup: the fulfillment module service carries its
+  // internal container as `__container__`; mirror Medusa's own bracket access.
+  try {
+    const moduleService = scope.resolve(Modules.FULFILLMENT) as {
+      __container__?: Record<string, unknown>
+    }
+    const internalContainer = moduleService.__container__
+    if (internalContainer) {
+      for (const key of ITHINK_PROVIDER_KEYS) {
+        try {
+          const provider = internalContainer[key] as RateHintsProvider | undefined
+          if (provider) {
+            return provider
+          }
+        } catch {
+          // fall through to the next candidate key
+        }
+      }
+    }
+  } catch {
+    // no module service in scope
   }
   return undefined
 }
@@ -43,36 +74,6 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
   const provider = resolveRateHintsProvider(req.scope)
   if (!provider) {
-    try {
-      const moduleService = req.scope.resolve(Modules.FULFILLMENT) as {
-        __container__?: { resolve: (key: string) => unknown }
-      }
-      const inner = moduleService.__container__
-      console.error(
-        "[rates-debug] root fp_* missing; module container present:",
-        Boolean(inner)
-      )
-      if (inner) {
-        for (const key of ITHINK_PROVIDER_KEYS) {
-          try {
-            const candidate = inner.resolve(key) as unknown
-            console.error("[rates-debug] inner resolve", key, "->", Boolean(candidate))
-          } catch (error) {
-            console.error(
-              "[rates-debug] inner resolve",
-              key,
-              "failed:",
-              error instanceof Error ? error.message : String(error)
-            )
-          }
-        }
-      }
-    } catch (error) {
-      console.error(
-        "[rates-debug] fulfillment init error:",
-        error instanceof Error ? error.message : String(error)
-      )
-    }
     res.status(502).json({ error: "rate_unavailable" })
     return
   }
@@ -99,7 +100,6 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     fromPincode = undefined
   }
   if (!fromPincode) {
-    console.error("[rates-debug] no from pincode from stock locations")
     res.status(502).json({ error: "rate_unavailable" })
     return
   }

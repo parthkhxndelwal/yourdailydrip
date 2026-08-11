@@ -163,6 +163,32 @@ describe("GET /store/ithink/rates min-rate and min-TAT computation", () => {
     expect(res.status).toHaveBeenCalledWith(200)
     expect(provider.getRateHints).toHaveBeenCalledWith("110001", "560001", undefined)
   })
+
+  it("resolves the provider from the module service internal container (production path)", async () => {
+    // In prod the root container has no fp_* registration; the fulfillment
+    // module service carries its internal container as __container__, and
+    // Medusa's own provider access is bracket property access, not .resolve().
+    const provider = {
+      getRateHints: jest.fn().mockResolvedValue(courierRates()),
+    }
+    const scope = {
+      resolve: (key: string) => {
+        if (key === Modules.FULFILLMENT) {
+          return { __container__: { fp_ithink_ithink: provider } }
+        }
+        if (key === Modules.STOCK_LOCATION) {
+          return stockLocationMock("110001")
+        }
+        return undefined
+      },
+    }
+    const res = responseMock()
+
+    await GET(requestMock(scope), res)
+
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(provider.getRateHints).toHaveBeenCalledWith("110001", "560001", undefined)
+  })
 })
 
 describe("GET /store/ithink/rates error handling", () => {
