@@ -39,8 +39,10 @@ function fromLocalDateTimeInput(value: string): string {
 const AnnouncementBarPage = () => {
   const queryClient = useQueryClient()
 
+  // Dashboard's useStore caches ["store", "detail"] as { store }; a distinct
+  // key is required here or the wrapped shape breaks store.id lookups.
   const { data: store, isLoading } = useQuery({
-    queryKey: ["store", "detail"],
+    queryKey: ["announcement-bar", "store"],
     queryFn: async () => {
       const response = await sdk.admin.store.list()
       return response.stores?.[0] ?? null
@@ -63,17 +65,20 @@ const AnnouncementBarPage = () => {
 
   const updateAnnouncementBar = useMutation({
     mutationFn: async (payload: AnnouncementBar) => {
-      if (!store?.id) {
+      const response = await sdk.admin.store.list()
+      const activeStore = response.stores?.[0]
+      if (!activeStore?.id) {
         throw new Error("No active store found")
       }
-      return sdk.admin.store.update(store.id, {
+      return sdk.admin.store.update(activeStore.id, {
         metadata: {
-          ...(store.metadata ?? {}),
+          ...(activeStore.metadata ?? {}),
           announcement_bar: payload,
         },
       })
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["announcement-bar", "store"] })
       queryClient.invalidateQueries({ queryKey: ["store", "detail"] })
       toast.success("Announcement bar updated")
     },
