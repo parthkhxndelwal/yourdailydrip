@@ -64,7 +64,9 @@ No data models; all state lives in `fulfillment.data`/`metadata` JSON. Authorita
 Modes: **dashboard** (default) = sync to iThink Store Order tab; ops books shipments in the iThink dashboard; Medusa learns AWB/status via the 30-min poll. **book** = legacy immediate booking capturing AWB + labels.
 
 ### resend (`src/modules/resend/`) - notification ModuleProvider (id "resend")
-- `service.ts` - sends via resend SDK; `templates.ts` holds three in-code templates: `preorder_ack`, `preorder_shipped`, `preorder_refund` (`{{key}}` interpolation). Keys referenced by subscribers.
+- `layout.ts` - shared branded HTML email layout (table-based, inline CSS, Daily Drip palette) + helpers: `escapeHtml`, `formatInr`, `formatDate`, `itemsRows`, `renderLayout`.
+- `service.ts` - sends via resend SDK; `templates.ts` holds five in-code templates: `order_ack`, `preorder_ack`, `order_shipped`, `preorder_refund`, `order_canceled` (`{{key}}` interpolation, HTML-escaped). Keys referenced by subscribers.
+- `scripts/resend-smoke.ts` - `medusa exec resend-smoke` sends a real `order_ack` test email (recipient from `RESEND_SMOKE_TO`) to verify DNS + API key + templates end-to-end.
 
 ## Workflows, Jobs, Subscribers
 
@@ -81,8 +83,10 @@ Modes: **dashboard** (default) = sync to iThink Store Order tab; ops books shipm
 **Subscribers** (`src/subscribers/`):
 - `order-placed.ts` - iThink auto-submit gate: skips unless payment captured, no existing fulfillment, has items, no enabled preorder variants, and provider mode = "book".
 - `preorder-created.ts` (order.placed) - creates `pending` Preorder rows, writes `order.metadata.preorder_expected_ship_date` (min available_date), sends `preorder_ack`.
-- `preorder-shipped.ts` (order.fulfillment_created) - `preorder_shipped` email with AWB + track URL.
+- `order-ack.ts` (order.placed) - sends `order_ack` for orders with NO enabled preorder variant items (preorders get `preorder_ack` instead; variant check, not row check - the two run concurrently).
+- `shipment-notification.ts` (order.fulfillment_created + fulfillment.updated) - sends `order_shipped` once per fulfillment when an AWB exists; dedupes via `metadata.shipped_email_sent`. Works in iThink dashboard mode because the poll emits `fulfillment.updated` after discovering the AWB (retries until it appears). Replaced `preorder-shipped.ts`.
 - `preorder-canceled.ts` (order.canceled) - flips rows to `cancelled`, sends `preorder_refund`.
+- `order-canceled.ts` (order.canceled) - sends `order_canceled` for orders with no preorder rows (preorders get `preorder_refund` instead).
 
 ## API Routes (file-based)
 
@@ -115,9 +119,9 @@ cd backend/apps/backend && npm run test:unit -- src/modules/ithink/services/__te
 cd backend/apps/backend && npm run test:unit -- -t "dashboard"
 ```
 
-9 unit specs exist: ithink client (804 lines), ithink-options, ithink-fulfillment-validation, ithink-dashboard-mode, order-placed subscriber, preorder-created subscriber, ithink-tracking job (432 lines), rates route, track route. Conventions: colocate `<name>.unit.spec.ts` in `__tests__/` next to source; mock via `jest.spyOn(IthinkClient.prototype, ...)`, constructor-injected `fetchImpl`, or `globalThis.fetch` swap; mock container as `{ resolve: (key) => deps[key] }`; assert `MedusaError` types; `jest.useFakeTimers()` for TTL tests; `clearRateCache()` between tests.
+14 unit specs exist: ithink client (804 lines), ithink-options, ithink-fulfillment-validation, ithink-dashboard-mode, order-placed subscriber, preorder-created subscriber, order-ack subscriber, shipment-notification subscriber, order-canceled subscriber, resend templates, ithink-tracking job (432 lines), rates route, track route, announcement route. Conventions: colocate `<name>.unit.spec.ts` in `__tests__/` next to source; mock via `jest.spyOn(IthinkClient.prototype, ...)`, constructor-injected `fetchImpl`, or `globalThis.fetch` swap; mock container as `{ resolve: (key) => deps[key] }`; assert `MedusaError` types; `jest.useFakeTimers()` for TTL tests; `clearRateCache()` between tests.
 
-**Coverage gaps** (candidates for new tests): `workflows/fulfill-due-preorders.ts` step logic (highest value), preorder workflows/steps, `jobs/preorder-fulfillment.ts`, `subscribers/preorder-shipped.ts` + `preorder-canceled.ts`, direct units for `services/tracking.ts` / `reconciliation.ts` / `shipment-enrichment.ts` / `fulfillment-params.ts`, admin routes, `api/middlewares.ts`.
+**Coverage gaps** (candidates for new tests): `workflows/fulfill-due-preorders.ts` step logic (highest value), preorder workflows/steps, `jobs/preorder-fulfillment.ts`, `subscribers/preorder-canceled.ts` (unit exists), `modules/resend/service.ts` (resend SDK send path), direct units for `services/tracking.ts` / `reconciliation.ts` / `shipment-enrichment.ts` / `fulfillment-params.ts`, admin routes, `api/middlewares.ts`.
 
 ## Code Style & Lint
 

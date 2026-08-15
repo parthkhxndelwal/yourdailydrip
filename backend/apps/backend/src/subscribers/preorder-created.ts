@@ -4,6 +4,7 @@ import type { Logger } from "@medusajs/framework/types"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { PREORDER_MODULE } from "../modules/preorder"
 import { PreorderStatus } from "../modules/preorder/models/preorder"
+import { formatDate, formatInr } from "../modules/resend/layout"
 
 type PreorderVariantRow = {
   id: string
@@ -15,7 +16,15 @@ type PreorderCreatedContext = {
   email?: string
   display_id?: string | null
   metadata?: Record<string, unknown> | null
-  items?: { id: string; variant_id?: string; title?: string; quantity: number }[]
+  total?: number
+  items?: {
+    id: string
+    variant_id?: string
+    title?: string
+    thumbnail?: string | null
+    unit_price?: number
+    quantity: number
+  }[]
 }
 
 export default async function preorderCreatedHandler({
@@ -34,9 +43,12 @@ export default async function preorderCreatedHandler({
       "email",
       "display_id",
       "metadata",
+      "total",
       "items.id",
       "items.variant_id",
       "items.title",
+      "items.thumbnail",
+      "items.unit_price",
       "items.quantity",
     ],
     filters: { id: data.id },
@@ -82,7 +94,15 @@ export default async function preorderCreatedHandler({
     const variant = variantById.get(item.variant_id ?? "")
     return variant === undefined
       ? []
-      : [{ variant, title: item.title, quantity: item.quantity }]
+      : [
+          {
+            variant,
+            title: item.title,
+            quantity: item.quantity,
+            thumbnail: item.thumbnail,
+            unit_price: item.unit_price,
+          },
+        ]
   })
 
   if (preorderLines.length === 0) {
@@ -115,10 +135,15 @@ export default async function preorderCreatedHandler({
       data: {
         order_id: data.id,
         display_id: order.display_id,
-        expected_ship_date: expectedShipDate,
+        expected_ship_date: formatDate(expectedShipDate),
+        ...(typeof order.total === "number" ? { total: formatInr(order.total) } : {}),
+        order_url: `${process.env.STOREFRONT_BASE_URL ?? ""}/order-confirmation?order=${data.id}`,
         items: preorderLines.map((line) => ({
           title: line.title ?? "Item",
           quantity: line.quantity,
+          thumbnail: line.thumbnail ?? undefined,
+          unit_price:
+            typeof line.unit_price === "number" ? formatInr(line.unit_price) : undefined,
         })),
       },
       trigger_type: "order.placed",

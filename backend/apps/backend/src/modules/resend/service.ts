@@ -11,7 +11,7 @@ import {
   Resend,
 } from "resend"
 import {
-  PreorderTemplateName,
+  EmailTemplateName,
   TEMPLATES,
   renderSubject,
   renderTemplate,
@@ -58,18 +58,18 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     }
   }
 
-  getTemplate(template: PreorderTemplateName, data: Record<string, unknown>): string {
+  getTemplate(template: EmailTemplateName, data: Record<string, unknown>): string {
     return renderTemplate(TEMPLATES[template], data)
   }
 
-  getTemplateSubject(template: PreorderTemplateName, data: Record<string, unknown>): string {
+  getTemplateSubject(template: EmailTemplateName, data: Record<string, unknown>): string {
     return renderSubject(TEMPLATES[template], data)
   }
 
   async send(
     notification: NotificationTypes.ProviderSendNotificationDTO
   ): Promise<NotificationTypes.ProviderSendNotificationResultsDTO> {
-    const template = TEMPLATES[notification.template as PreorderTemplateName]
+    const template = TEMPLATES[notification.template as EmailTemplateName]
 
     if (!template) {
       this.logger.error(
@@ -83,8 +83,8 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     const emailOptions: CreateEmailOptions = {
       from: this.options.from,
       to: [notification.to],
-      subject: this.getTemplateSubject(notification.template as PreorderTemplateName, data),
-      html: this.getTemplate(notification.template as PreorderTemplateName, data),
+      subject: this.getTemplateSubject(notification.template as EmailTemplateName, data),
+      html: this.getTemplate(notification.template as EmailTemplateName, data),
     }
 
     const { data: email, error } = await this.resendClient.emails.send(emailOptions)
