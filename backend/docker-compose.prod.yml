@@ -41,8 +41,12 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      # Compose-network Postgres, never localhost.
-      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:?}@postgres:5432/${POSTGRES_DB:-medusa}
+      # Compose-network Postgres, never localhost. sslmode=disable: medusa's
+      # migration runner auto-enables SSL for non-local hosts (compose hostname
+      # "postgres" is not localhost) which stalls against our non-SSL Postgres;
+      # this flag makes loadDatabaseConfig default to ssl:false and is stripped
+      # from the URL before the driver uses it.
+      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:?}@postgres:5432/${POSTGRES_DB:-medusa}?sslmode=disable
       # CORS: production origin + local dev default. Add Cloudflare preview
       # origins in backend/.env (STORE_CORS override); NEVER wildcard with
       # credentials. Comma-separated, no spaces.
