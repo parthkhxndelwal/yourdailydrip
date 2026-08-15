@@ -158,58 +158,60 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
-        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-          <SheetTrigger asChild className="lg:hidden">
-            <Button variant="ghost" size="icon" aria-label="Open menu">
-              <Menu />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-72 p-6">
-            <SheetTitle className="font-display text-xl">Daily Drip</SheetTitle>
-            <nav className="mt-6 flex flex-col gap-4">
-              <Link to="/shop" className={navLink} onClick={() => setMenuOpen(false)}>Shop All</Link>
-              <Link to="/skin-care" className={navLink} onClick={() => setMenuOpen(false)}>Skin Care</Link>
-              <Link to="/hair-care" className={navLink} onClick={() => setMenuOpen(false)}>Hair Care</Link>
-              <Link to="/track-order" className={navLink} onClick={() => setMenuOpen(false)}>Track Order</Link>
-              <Link to="/blogs" className={navLink} onClick={() => setMenuOpen(false)}>Blogs</Link>
-              <Link to="/account" className={navLink} onClick={() => setMenuOpen(false)}>Account / Sign Up</Link>
-            </nav>
-          </SheetContent>
-        </Sheet>
+      <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4">
+        <div className="flex items-center gap-4 justify-self-start">
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild className="lg:hidden">
+              <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Menu />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72 p-6">
+              <SheetTitle className="font-display text-xl">Daily Drip</SheetTitle>
+              <nav className="mt-6 flex flex-col gap-4">
+                <Link to="/shop" className={navLink} onClick={() => setMenuOpen(false)}>Shop All</Link>
+                <Link to="/skin-care" className={navLink} onClick={() => setMenuOpen(false)}>Skin Care</Link>
+                <Link to="/hair-care" className={navLink} onClick={() => setMenuOpen(false)}>Hair Care</Link>
+                <Link to="/track-order" className={navLink} onClick={() => setMenuOpen(false)}>Track Order</Link>
+                <Link to="/blogs" className={navLink} onClick={() => setMenuOpen(false)}>Blogs</Link>
+                <Link to="/account" className={navLink} onClick={() => setMenuOpen(false)}>Account / Sign Up</Link>
+              </nav>
+            </SheetContent>
+          </Sheet>
+
+          <nav className="hidden items-center gap-6 lg:flex">
+            <DropdownMenu>
+              <DropdownMenuTrigger className={navLink + " flex items-center gap-1 outline-none"}>
+                Shop <ChevronDown size={14} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                  What would you like to shop?
+                </DropdownMenuLabel>
+                <DropdownMenuItem asChild>
+                  <Link to="/skin-care">Skin Care</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/hair-care">Hair Care</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/shop">Shop everything</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Link to="/hair-care" className={navLink}>Hair Care</Link>
+            <Link to="/skin-care" className={navLink}>Skin Care</Link>
+            <Link to="/track-order" className={navLink + " flex items-center gap-1"}>
+              <Package size={14} /> Track Order
+            </Link>
+          </nav>
+        </div>
 
         <Link to="/" className="flex shrink-0 items-center" aria-label="Daily Drip home">
-          <img src="/dailydrip_logo.png" alt="Daily Drip" className="h-10 w-auto" />
+          <img src="/dailydrip_logo.png" alt="Daily Drip" className="h-12 w-auto" />
         </Link>
 
-        <nav className="ml-6 hidden items-center gap-6 lg:flex">
-          <DropdownMenu>
-            <DropdownMenuTrigger className={navLink + " flex items-center gap-1 outline-none"}>
-              Shop <ChevronDown size={14} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                What would you like to shop?
-              </DropdownMenuLabel>
-              <DropdownMenuItem asChild>
-                <Link to="/skin-care">Skin Care</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/hair-care">Hair Care</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/shop">Shop everything</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Link to="/hair-care" className={navLink}>Hair Care</Link>
-          <Link to="/skin-care" className={navLink}>Skin Care</Link>
-          <Link to="/track-order" className={navLink + " flex items-center gap-1"}>
-            <Package size={14} /> Track Order
-          </Link>
-        </nav>
-
-        <div className="ml-auto flex items-center gap-1">
+        <div className="flex items-center gap-1 justify-self-end">
           <Button variant="ghost" size="icon" aria-label="Search" onClick={() => setSearchOpen(true)}>
             <Search />
           </Button>

@@ -30,7 +30,7 @@ export function HeroSection() {
   const { data, isPending } = useMappedFeaturedProducts(1, true);
   const product = data?.[0];
   return (
-    <section className="relative overflow-hidden bg-forest">
+    <section className="relative max-h-[90vh] overflow-hidden bg-forest">
       {/* Soft radial glows behind the composition */}
       <div
         aria-hidden
@@ -170,7 +170,7 @@ export function HeroSection() {
                 alt={product ? `${product.name} — product image` : "Daily Drip product"}
                 width={1600}
                 height={1200}
-                className="h-auto w-full object-cover"
+                className="h-auto max-h-[70vh] w-full object-cover"
               />
             </div>
 
