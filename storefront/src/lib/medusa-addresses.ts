@@ -9,7 +9,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { customerKeys, hasAuthToken } from "./medusa-auth";
+import { customerKeys, hasAuthToken, healIfUnauthorized } from "./medusa-auth";
 import { sdk } from "./medusa";
 import type { ShippingAddressForm } from "./medusa-checkout";
 
@@ -35,8 +35,15 @@ export function useCustomerAddresses() {
   return useQuery<StoreCustomerAddress[], Error>({
     queryKey: customerAddressKeys.all,
     queryFn: async () => {
-      const { addresses } = await sdk.store.customer.listAddress();
-      return addresses;
+      try {
+        const { addresses } = await sdk.store.customer.listAddress();
+        return addresses;
+      } catch (error) {
+        // A stale/expired JWT 401s here too — heal the session (drop the
+        // token) and report an empty address book instead of erroring out.
+        if (healIfUnauthorized(error)) return [];
+        throw error;
+      }
     },
     enabled: hasAuthToken(),
     staleTime: 30_000,

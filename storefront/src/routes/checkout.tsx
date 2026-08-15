@@ -37,7 +37,7 @@ import {
 } from "@/lib/medusa-addresses";
 import { cartKeys, clearCartId, toCartLines, useCart, type StoreCart } from "@/lib/medusa-cart";
 import { sdk } from "@/lib/medusa";
-import { hasAuthToken, useCustomer } from "@/lib/medusa-auth";
+import { hasAuthToken, healIfUnauthorized, useCustomer } from "@/lib/medusa-auth";
 import { initiateRazorpaySession } from "@/lib/medusa-payment";
 import {
   fetchShippingRateHints,
@@ -255,10 +255,15 @@ function CheckoutFlow({
                 createAddress.mutate(
                   toCreateAddressBody(address, cart.email ?? customerQuery.data?.email ?? ""),
                   {
-                    onError: () =>
+                    onError: (error) => {
+                      // A stale JWT fails the account save with 401. The order
+                      // address is already saved to the cart, so heal the
+                      // session silently instead of alarming the customer.
+                      if (healIfUnauthorized(error)) return;
                       toast.error(
                         "Address saved for this order, but we couldn't save it to your account.",
-                      ),
+                      );
+                    },
                   },
                 );
               }}

@@ -38,6 +38,31 @@ export function hasAuthToken(): boolean {
   }
 }
 
+/** Drop the stored customer JWT (best-effort) — used to heal stale sessions. */
+export function clearAuthToken(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(AUTH_TOKEN_KEY);
+  } catch {
+    // Best-effort; hasAuthToken() re-reads storage every call.
+  }
+}
+
+/** True when a failed SDK call was rejected as unauthorized (401). */
+export function isUnauthorizedError(error: unknown): boolean {
+  return error instanceof FetchError && error.status === 401;
+}
+
+/**
+ * Heal a stale/expired JWT: clears the token and reports that it happened.
+ * Returns true when the error was a 401 and the token was dropped.
+ */
+export function healIfUnauthorized(error: unknown): boolean {
+  if (!isUnauthorizedError(error)) return false;
+  clearAuthToken();
+  return true;
+}
+
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export type StoreCustomer = Awaited<
@@ -80,14 +105,21 @@ export const customerKeys = {
 
 /**
  * Fetch the logged-in customer via `sdk.store.customer.retrieve()`.
- * Disabled (never hits the network) until a JWT exists in storage.
+ * Disabled (never hits the network) until a JWT exists in storage. A 401 from
+ * a stale/expired token heals the session: the token is dropped and the query
+ * resolves null (signed out) instead of leaving the app half-signed-in.
  */
 export function useCustomer() {
-  return useQuery<StoreCustomer, Error>({
+  return useQuery<StoreCustomer | null, Error>({
     queryKey: customerKeys.me,
     queryFn: async () => {
-      const { customer } = await sdk.store.customer.retrieve();
-      return customer;
+      try {
+        const { customer } = await sdk.store.customer.retrieve();
+        return customer;
+      } catch (error) {
+        if (healIfUnauthorized(error)) return null;
+        throw error;
+      }
     },
     enabled: hasAuthToken(),
     staleTime: 30_000,
