@@ -169,9 +169,8 @@ export function Header() {
             <SheetContent side="left" className="w-72 p-6">
               <SheetTitle className="font-display text-xl">Daily Drip</SheetTitle>
               <nav className="mt-6 flex flex-col gap-4">
-                <Link to="/shop" className={navLink} onClick={() => setMenuOpen(false)}>Shop All</Link>
-                <Link to="/skin-care" className={navLink} onClick={() => setMenuOpen(false)}>Skin Care</Link>
-                <Link to="/hair-care" className={navLink} onClick={() => setMenuOpen(false)}>Hair Care</Link>
+              <Link to="/shop" className={navLink} onClick={() => setMenuOpen(false)}>Shop All</Link>
+              <Link to="/hair-care" className={navLink} onClick={() => setMenuOpen(false)}>Hair Care</Link>
                 <Link to="/track-order" className={navLink} onClick={() => setMenuOpen(false)}>Track Order</Link>
                 <Link to="/blogs" className={navLink} onClick={() => setMenuOpen(false)}>Blogs</Link>
                 <Link to="/account" className={navLink} onClick={() => setMenuOpen(false)}>Account / Sign Up</Link>
@@ -200,7 +199,6 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
             <Link to="/hair-care" className={navLink}>Hair Care</Link>
-            <Link to="/skin-care" className={navLink}>Skin Care</Link>
             <Link to="/track-order" className={navLink + " flex items-center gap-1"}>
               <Package size={14} /> Track Order
             </Link>
@@ -208,7 +206,7 @@ export function Header() {
         </div>
 
         <Link to="/" className="flex shrink-0 items-center" aria-label="Daily Drip home">
-          <img src="/dailydrip_logo.png" alt="Daily Drip" className="h-12 w-auto" />
+          <img src="/dailydrip_logo.png" alt="Daily Drip" className="h-14 w-auto" />
         </Link>
 
         <div className="flex items-center gap-1 justify-self-end">
