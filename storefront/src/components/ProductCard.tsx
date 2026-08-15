@@ -43,8 +43,9 @@ export function ProductCard({ product }: { product: Product }) {
         type="button"
         aria-label="Add to wishlist"
         onClick={() => {
-          toggleWishlist(product.slug);
-          toast(inWishlist(product.slug) ? "Removed from wishlist" : "Saved to wishlist");
+          const saving = !inWishlist(product.slug)
+          toggleWishlist(product.slug)
+          toast(saving ? "Saved to wishlist" : "Removed from wishlist")
         }}
         className="absolute right-3 bottom-[8.5rem] grid size-9 place-items-center rounded-full bg-card/90 backdrop-blur transition-colors hover:bg-card"
       >
