@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ChevronDown,
@@ -21,19 +21,84 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { formatPrice, products } from "@/lib/products";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  useMappedFeaturedProducts,
+  useMappedSearchProducts,
+  type MappedMedusaProduct,
+} from "@/lib/medusa-hooks";
+import { formatPrice } from "@/lib/products";
 import { useShop } from "@/lib/store";
 
 const navLink =
   "text-sm font-medium text-foreground/80 transition-colors hover:text-primary";
 
+// Small inline debounce so keystrokes don't fire a Medusa search per character.
+function useDebouncedValue<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebounced(value), delay);
+    return () => window.clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
+
+function SearchResultRow({
+  product,
+  onSelect,
+}: {
+  product: MappedMedusaProduct;
+  onSelect: () => void;
+}) {
+  return (
+    <li>
+      <Link
+        to="/product/$slug"
+        params={{ slug: product.slug }}
+        onClick={onSelect}
+        className="flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-secondary"
+      >
+        <img src={product.images[0]} alt="" width={48} height={48} loading="lazy" className="size-12 rounded object-cover" />
+        <span className="flex-1">
+          <span className="block text-sm font-medium">{product.name}</span>
+          <span className="block text-xs text-muted-foreground">{product.tagline}</span>
+        </span>
+        <span className="text-sm">{formatPrice(product.price)}</span>
+      </Link>
+    </li>
+  );
+}
+
+function SearchLoadingRows() {
+  return (
+    <>
+      {[0, 1, 2].map((i) => (
+        <li key={i} className="flex items-center gap-3 p-2">
+          <Skeleton className="size-12 shrink-0 rounded" />
+          <span className="flex-1 space-y-2">
+            <Skeleton className="h-3.5 w-2/3" />
+            <Skeleton className="h-3 w-1/2" />
+          </span>
+          <Skeleton className="h-4 w-14" />
+        </li>
+      ))}
+    </>
+  );
+}
+
 function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const [q, setQ] = useState("");
-  const results = q.trim()
-    ? products.filter((p) =>
-        (p.name + p.tagline + p.category).toLowerCase().includes(q.trim().toLowerCase()),
-      )
-    : products.slice(0, 4);
+  const debouncedQ = useDebouncedValue(q, 300);
+  const searchTerm = debouncedQ.trim();
+  const hasQuery = q.trim().length > 0;
+
+  // Gated on `open` so no fetch fires while the dialog is closed (it stays
+  // mounted in the header).
+  const featured = useMappedFeaturedProducts(4, open);
+  const search = useMappedSearchProducts(searchTerm, 8);
+
+  const close = () => onOpenChange(false);
+  const searchResults = search.data ?? [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -48,25 +113,37 @@ function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
           placeholder="Try “serum”, “hair oil”, “dry skin”…"
         />
         <ul className="max-h-80 space-y-1 overflow-y-auto">
-          {results.map((p) => (
-            <li key={p.slug}>
-              <Link
-                to="/product/$slug"
-                params={{ slug: p.slug }}
-                onClick={() => onOpenChange(false)}
-                className="flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-secondary"
-              >
-                <img src={p.images[0]} alt="" width={48} height={48} loading="lazy" className="size-12 rounded object-cover" />
-                <span className="flex-1">
-                  <span className="block text-sm font-medium">{p.name}</span>
-                  <span className="block text-xs text-muted-foreground">{p.tagline}</span>
-                </span>
-                <span className="text-sm">{formatPrice(p.price)}</span>
-              </Link>
-            </li>
-          ))}
-          {results.length === 0 && (
-            <li className="p-3 text-sm text-muted-foreground">No products matched “{q}”.</li>
+          {hasQuery ? (
+            searchTerm.length === 0 || search.isPending ? (
+              <SearchLoadingRows />
+            ) : search.isError ? (
+              <li className="p-3 text-sm text-muted-foreground">
+                Search is temporarily unavailable — please try again later.
+              </li>
+            ) : searchResults.length === 0 ? (
+              <li className="p-3 text-sm text-muted-foreground">No products matched “{q}”.</li>
+            ) : (
+              searchResults.map((p) => <SearchResultRow key={p.slug} product={p} onSelect={close} />)
+            )
+          ) : (
+            <>
+              <li className="px-3 pt-2 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                Popular right now
+              </li>
+              {featured.isPending ? (
+                <SearchLoadingRows />
+              ) : featured.isError ? (
+                <li className="p-3 text-sm text-muted-foreground">
+                  Search is temporarily unavailable — please try again later.
+                </li>
+              ) : featured.data && featured.data.length > 0 ? (
+                featured.data.map((p) => <SearchResultRow key={p.slug} product={p} onSelect={close} />)
+              ) : (
+                <li className="p-3 text-sm text-muted-foreground">
+                  No products yet — check back soon.
+                </li>
+              )}
+            </>
           )}
         </ul>
       </DialogContent>

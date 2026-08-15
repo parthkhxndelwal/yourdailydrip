@@ -14,5 +14,5 @@ export const PRICE = 559;
 /** Striking price the offer is compared against (INR). */
 export const MRP = 699;
 
-/** Product slug — must match the catalog entry in src/lib/products.ts. */
+/** Product slug — must match a live product handle in Medusa. */
 export const PRODUCT_SLUG = "advanced-hair-density-serum";

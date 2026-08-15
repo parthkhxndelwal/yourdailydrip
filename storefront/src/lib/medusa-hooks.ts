@@ -209,6 +209,16 @@ async function fetchProducts(params: {
   return response.products ?? [];
 }
 
+async function fetchSearchProducts(q: string, limit?: number): Promise<StoreProduct[]> {
+  const response = await sdk.store.product.list({
+    q,
+    fields: PRODUCT_FIELDS,
+    region_id: REGION_ID,
+    limit: limit ?? 8,
+  });
+  return response.products ?? [];
+}
+
 // ── TanStack Query key factory ──────────────────────────────────────────────
 
 export const queryKeys = {
@@ -275,6 +285,34 @@ export function useCategories() {
   });
 }
 
+/**
+ * Free-text search across products (Store API `q`). Returns raw Medusa Store
+ * API products. Use `useMappedSearchProducts` for the app's Product shape.
+ * Disabled until the query is non-empty.
+ */
+export function useSearchProducts(q: string, limit?: number) {
+  return useQuery<StoreProduct[], Error>({
+    queryKey: [...queryKeys.products, { search: q }],
+    queryFn: async () => fetchSearchProducts(q, limit),
+    enabled: q.trim().length > 0,
+    staleTime: 60_000,
+  });
+}
+
+/**
+ * A small "featured" product list for surfaces that need a default set (e.g.
+ * the header search dialog's empty-query state). `enabled` is controllable so
+ * callers can defer the fetch until the surface is actually visible.
+ */
+export function useFeaturedProducts(limit = 4, enabled = true) {
+  return useQuery<StoreProduct[], Error>({
+    queryKey: [...queryKeys.products, { featured: limit }],
+    queryFn: async () => fetchProducts({ limit }),
+    enabled,
+    staleTime: 60_000,
+  });
+}
+
 // ── Convenience selectors — mapped products ─────────────────────────────────
 
 export function useMappedProducts(category?: string | undefined) {
@@ -286,5 +324,17 @@ export function useMappedProducts(category?: string | undefined) {
 export function useMappedProduct(slug: string) {
   const query = useProduct(slug);
   const mapped = query.data ? mapMedusaProductToProduct(query.data) : undefined;
+  return { ...query, data: mapped };
+}
+
+export function useMappedSearchProducts(q: string, limit?: number) {
+  const query = useSearchProducts(q, limit);
+  const mapped = query.data?.map(mapMedusaProductToProduct) ?? undefined;
+  return { ...query, data: mapped };
+}
+
+export function useMappedFeaturedProducts(limit = 4, enabled = true) {
+  const query = useFeaturedProducts(limit, enabled);
+  const mapped = query.data?.map(mapMedusaProductToProduct) ?? undefined;
   return { ...query, data: mapped };
 }

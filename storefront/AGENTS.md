@@ -46,14 +46,14 @@ bun run lint / format
 | `checkout.tsx` | `/checkout` | 2-step: address → payment. Auto-attaches CHEAPEST shipping option (no picker). Razorpay modal → `cart.complete` → `/order-confirmation?order=<id>` |
 | `order-confirmation.tsx` | `/order-confirmation` | Guest order lookup by `?order=`; items/totals/status/tracking section |
 | `track-order.tsx` | `/track-order` | AWB lookup via `useTrackShipment`; scan timeline, pending/not-found/error states |
-| `wishlist.tsx` | `/wishlist` | Wishlist grid (static catalog) |
+| `wishlist.tsx` | `/wishlist` | Wishlist grid (slugs resolved against live Medusa products via `useMappedProducts`) |
 | `account.tsx` | `/account` | Sign in/up (emailpass) + Profile/Orders/Addresses tabs |
 | `about.tsx`, `our-story.tsx`, `privacy.tsx`, `terms.tsx`, `returns.tsx`, `shipping-policy.tsx`, `how-to-use.tsx`, `blogs.tsx` | static | Content pages via `PageShell` + `Section` |
 
 ## Data Layer (`src/lib/`)
 
 - `medusa.ts` - single configured SDK client (browser `VITE_*` / SSR `process.env`).
-- `medusa-hooks.ts` - catalog hooks (`useProducts`, `useProduct`, `useCategories`), `mapMedusaProductToProduct` (reads `metadata.mrp/benefits/ingredients/howToUse/suitableFor/rating/reviews`), `REGION_ID = "reg_01KZ1FDN3K5N681SNXFQNA5NM5"` (live region - keep in sync with backend seed).
+- `medusa-hooks.ts` - catalog + search hooks (`useProducts`, `useProduct`, `useCategories`, `useSearchProducts`/`useMappedSearchProducts` for free-text `q` search, `useFeaturedProducts`/`useMappedFeaturedProducts` for default sets), `mapMedusaProductToProduct` (reads `metadata.mrp/benefits/ingredients/howToUse/suitableFor/rating/reviews`), `REGION_ID = "reg_01KZ1FDN3K5N681SNXFQNA5NM5"` (live region - keep in sync with backend seed).
 - `medusa-cart.ts` - server cart is source of truth; localStorage holds only `dd-cart-id`.
 - `medusa-checkout.ts` - pure helpers: `validateAddress` (India: phone `^[6-9]\d{9}$`, pincode `^\d{6}$`), iThink option detection (`ITHINK_PROVIDER_ID = "ithink"`), `fetchShippingRateHints` → `GET /store/ithink/rates` via `sdk.client.fetch` (the ONE sanctioned raw-ish call; 502/network → null, non-blocking).
 - `medusa-orders.ts` - `useOrder` (guest lookup), `useCustomerOrders` (JWT-scoped), `orderTrackingInfo`/`orderAwb` (reads `fulfillment.data.awb` / `refnum`).
@@ -62,14 +62,14 @@ bun run lint / format
 - `medusa-payment.ts` - `initiateRazorpaySession` (provider `pp_razorpay_razorpay`), amount in paise from `session.data.razorpayOrder` - never convert.
 - `medusa-addresses.ts` - customer address book CRUD.
 - `razorpay.ts` - lazy `checkout.razorpay.com/v1/checkout.js` loader; only `{ type: "order" }` resolves; cancel/fail leave cart intact.
-- `products.ts` - STATIC fallback catalog (7 products) used by header search / wishlist / prelaunch. Catalog pages use Medusa via `medusa-hooks` - keep both in sync when adding products.
+- `products.ts` - shared product types + `formatPrice`/`discountPct` helpers ONLY. No catalog data lives here anymore - all product content (catalog, search, wishlist, PDP) is fetched live from Medusa via `medusa-hooks`.
 - `store.tsx` - `ShopProvider`/`useShop` context: cart + wishlist (`dd-wishlist` localStorage, debounced 400ms sync to `customer.metadata.wishlist` for signed-in users).
 
 **Invariants**: prices are INR integers end-to-end (749 = Rs 749), never divide/multiply; explicit `fields` on every Store API call; SDK bodies are plain objects, never `JSON.stringify`.
 
 ## Components (`src/components/`)
 
-- **Chrome**: `Header.tsx` (sticky, dropdown nav, SearchDialog, wishlist/cart badges, logo), `AnnouncementBar.tsx` (promo marquee), `Footer.tsx` (dark forest green, socials, Shop/Company/Help columns, local-only newsletter), `Chatbot.tsx` (rule-based "Drippy"; **launcher hidden** via `.chat-toggle-hidden` in `styles.css` - remove that rule to re-enable).
+- **Chrome**: `Header.tsx` (sticky, dropdown nav, live Medusa search dialog, wishlist/cart badges, logo), `AnnouncementBar.tsx` (promo marquee), `Footer.tsx` (dark forest green, socials, Shop/Company/Help columns, local-only newsletter), `Chatbot.tsx` (rule-based "Drippy"; **launcher hidden** via `.chat-toggle-hidden` in `styles.css` - remove that rule to re-enable).
 - **landing/**: transparent `Navbar.tsx`, countdown `AnnouncementBar.tsx`, Hero/Benefits/Ingredients/Promotion/Trust/FAQ sections, `Reveal.tsx` scroll-reveal.
 - **product/**: `Collection.tsx`, `ProductCard.tsx`, `ProductImageGallery.tsx`, `ProductInfoPanel.tsx`, `ProductReviewsSection.tsx`, `RelatedProductsSection.tsx`, skeletons.
 - **checkout/**: `StepIndicator.tsx`, `CheckoutAddressForm.tsx`, `CheckoutAuthModal.tsx`, `CheckoutSummary.tsx`, `PaymentStep.tsx`.
@@ -97,5 +97,5 @@ Convention: colocate `*.test.ts` next to source; mock the SDK module, keep pure 
 - Raw `fetch` to Medusa instead of the SDK client in `medusa.ts`.
 - Converting/formatting prices (INR integers; format only at render via `formatPrice`).
 - Editing `routeTree.gen.ts` or adding a duplicate Vite plugin / tailwind.config.
-- Forgetting the static-vs-Medusa product duality (`products.ts` vs `medusa-hooks`).
+- Hardcoding product data in components instead of reading live from `medusa-hooks` (`products.ts` holds only types/helpers).
 - Hand-editing the `LOVABLE:BEGIN/END` block above or rewriting published git history (Lovable sync).
