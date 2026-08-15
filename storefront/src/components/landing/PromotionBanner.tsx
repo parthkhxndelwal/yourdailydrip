@@ -3,10 +3,9 @@ import { motion } from "framer-motion";
 import { ArrowRight, FlaskConical, MapPin, ShieldCheck } from "lucide-react";
 
 import hero from "@/assets/hero.jpg";
-import { MRP, PRICE, PRODUCT_SLUG } from "@/lib/prelaunch";
+import { useMappedFeaturedProducts } from "@/lib/medusa-hooks";
+import { discountPct, formatPrice } from "@/lib/products";
 import { Reveal } from "./Reveal";
-
-const DISCOUNT = Math.round(((MRP - PRICE) / MRP) * 100);
 
 const TRUST_POINTS = [
   { Icon: ShieldCheck, label: "Safe & Tested" },
@@ -15,6 +14,8 @@ const TRUST_POINTS = [
 ] as const;
 
 export function PromotionBanner() {
+  const { data } = useMappedFeaturedProducts(1, true);
+  const product = data?.[0];
   return (
     <section className="bg-cream-soft px-4 pb-20 md:px-8 md:pb-28">
       <div className="mx-auto max-w-6xl">
@@ -32,8 +33,8 @@ export function PromotionBanner() {
             <div className="relative grid items-center gap-10 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.3fr)_minmax(0,0.9fr)]">
               {/* Bottle + packaging visual */}
               <img
-                src={hero}
-                alt="Advanced Hair Density Serum bottle beside botanicals"
+                src={product?.images[0] ?? hero}
+                alt={product ? `${product.name} — product image` : "Daily Drip product"}
                 className="h-52 w-full rounded-2xl border border-white/10 object-cover md:h-64"
                 loading="lazy"
               />
@@ -49,24 +50,36 @@ export function PromotionBanner() {
                 <p className="mt-3 text-cream/70">Limited time offer. Limited stock.</p>
 
                 <div className="mt-7 flex flex-wrap items-center gap-x-9 gap-y-6">
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                    <Link
-                      to="/product/$slug"
-                      params={{ slug: PRODUCT_SLUG }}
-                      className="inline-flex h-[58px] items-center gap-3 rounded-xl bg-cream px-9 text-[13px] font-semibold uppercase tracking-[0.22em] text-forest transition-shadow hover:shadow-[0_14px_40px_-16px_rgba(247,244,236,0.5)]"
-                    >
-                      Pre-Order Now
-                      <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
-                    </Link>
-                  </motion.div>
+                  {product ? (
+                    <>
+                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                        <Link
+                          to="/product/$slug"
+                          params={{ slug: product.slug }}
+                          className="inline-flex h-[58px] items-center gap-3 rounded-xl bg-cream px-9 text-[13px] font-semibold uppercase tracking-[0.22em] text-forest transition-shadow hover:shadow-[0_14px_40px_-16px_rgba(247,244,236,0.5)]"
+                        >
+                          Shop Now
+                          <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+                        </Link>
+                      </motion.div>
 
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-medium text-cream">₹{PRICE}</span>
-                    <span className="text-base text-cream/45 line-through">₹{MRP}</span>
-                    <span className="rounded-full bg-gold/20 px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-gold">
-                      {DISCOUNT}% Off
-                    </span>
-                  </div>
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-3xl font-medium text-cream">
+                          {formatPrice(product.price)}
+                        </span>
+                        {product.mrp && (
+                          <span className="text-base text-cream/45 line-through">
+                            {formatPrice(product.mrp)}
+                          </span>
+                        )}
+                        {discountPct(product) > 0 && (
+                          <span className="rounded-full bg-gold/20 px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-gold">
+                            {discountPct(product)}% Off
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  ) : null}
                 </div>
               </div>
 

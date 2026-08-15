@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import { ArrowRight, Droplets, FlaskConical, Leaf, Sparkles } from "lucide-react";
 
 import hero from "@/assets/hero.jpg";
-import { MRP, PRICE, PRODUCT_SLUG } from "@/lib/prelaunch";
-
-const DISCOUNT = Math.round(((MRP - PRICE) / MRP) * 100);
+import { Skeleton } from "@/components/ui/skeleton";
+import { useMappedFeaturedProducts } from "@/lib/medusa-hooks";
+import { discountPct, formatPrice } from "@/lib/products";
 
 const FEATURES = [
   { Icon: Leaf, label: "Clinically Researched Actives" },
@@ -27,6 +27,8 @@ const fadeUp = (delay: number) => ({
 });
 
 export function HeroSection() {
+  const { data, isPending } = useMappedFeaturedProducts(1, true);
+  const product = data?.[0];
   return (
     <section className="relative overflow-hidden bg-forest">
       {/* Soft radial glows behind the composition */}
@@ -58,10 +60,19 @@ export function HeroSection() {
           <motion.div {...fadeUp(0.16)} className="mt-8 h-px w-16 bg-sage/60" />
 
           <motion.div {...fadeUp(0.22)} className="mt-8">
-            <p className="text-lg font-medium text-cream md:text-xl">Advanced Hair Density Serum</p>
-            <p className="mt-1.5 text-base text-cream/70 md:text-lg">
-              Powered by science. Rooted in nature.
-            </p>
+            {product ? (
+              <>
+                <p className="text-lg font-medium text-cream md:text-xl">{product.name}</p>
+                <p className="mt-1.5 text-base text-cream/70 md:text-lg">
+                  Powered by science. Rooted in nature.
+                </p>
+              </>
+            ) : (
+              <>
+                <Skeleton className="h-7 w-64 bg-white/10" />
+                <Skeleton className="mt-2 h-5 w-48 bg-white/10" />
+              </>
+            )}
           </motion.div>
 
           <motion.ul
@@ -80,24 +91,41 @@ export function HeroSection() {
             {...fadeUp(0.38)}
             className="mt-12 flex flex-wrap items-center gap-x-9 gap-y-7"
           >
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                to="/product/$slug"
-                params={{ slug: PRODUCT_SLUG }}
-                className="inline-flex h-[60px] items-center gap-3 rounded-xl bg-cream px-10 text-[13px] font-semibold uppercase tracking-[0.22em] text-forest transition-shadow hover:shadow-[0_14px_40px_-16px_rgba(247,244,236,0.55)]"
-              >
-                Pre-Order Now
-                <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
-              </Link>
-            </motion.div>
+            {product ? (
+              <>
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Link
+                    to="/product/$slug"
+                    params={{ slug: product.slug }}
+                    className="inline-flex h-[60px] items-center gap-3 rounded-xl bg-cream px-10 text-[13px] font-semibold uppercase tracking-[0.22em] text-forest transition-shadow hover:shadow-[0_14px_40px_-16px_rgba(247,244,236,0.55)]"
+                  >
+                    Shop Now
+                    <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+                  </Link>
+                </motion.div>
 
-            <div className="flex items-baseline gap-3">
-              <span className="text-[26px] font-medium text-cream">₹{PRICE}</span>
-              <span className="text-base text-cream/45 line-through">₹{MRP}</span>
-              <span className="text-[11px] uppercase tracking-[0.2em] text-gold">
-                {DISCOUNT}% Off
-              </span>
-            </div>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-[26px] font-medium text-cream">
+                    {formatPrice(product.price)}
+                  </span>
+                  {product.mrp && (
+                    <span className="text-base text-cream/45 line-through">
+                      {formatPrice(product.mrp)}
+                    </span>
+                  )}
+                  {discountPct(product) > 0 && (
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-gold">
+                      {discountPct(product)}% Off
+                    </span>
+                  )}
+                </div>
+              </>
+            ) : isPending ? (
+              <>
+                <Skeleton className="h-[60px] w-44 rounded-xl bg-white/10" />
+                <Skeleton className="h-8 w-40 bg-white/10" />
+              </>
+            ) : null}
           </motion.div>
 
           <motion.div {...fadeUp(0.46)} className="mt-10 flex items-center gap-3.5">
@@ -138,8 +166,8 @@ export function HeroSection() {
           >
             <div className="relative overflow-hidden rounded-[2rem]">
               <img
-                src={hero}
-                alt="Advanced Hair Density Serum — amber glass bottle resting on fresh green botanicals"
+                src={product?.images[0] ?? hero}
+                alt={product ? `${product.name} — product image` : "Daily Drip product"}
                 width={1600}
                 height={1200}
                 className="h-auto w-full object-cover"
@@ -157,15 +185,17 @@ export function HeroSection() {
             </div>
 
             {/* Label plate */}
-            <div className="absolute bottom-5 left-5 rounded-xl border border-white/10 bg-forest/70 px-4 py-3 backdrop-blur-md">
-              <span className="block text-[9px] uppercase tracking-[0.3em] text-sage">
-                Daily Drip
-              </span>
-              <span className="mt-1 block font-display text-sm text-cream">
-                Advanced Hair Density Serum
-              </span>
-              <span className="mt-0.5 block text-[10px] text-cream/60">30 ml</span>
-            </div>
+            {product && (
+              <div className="absolute bottom-5 left-5 rounded-xl border border-white/10 bg-forest/70 px-4 py-3 backdrop-blur-md">
+                <span className="block text-[9px] uppercase tracking-[0.3em] text-sage">
+                  Daily Drip
+                </span>
+                <span className="mt-1 block max-w-[220px] font-display text-sm text-cream">
+                  {product.name}
+                </span>
+                <span className="mt-0.5 block text-[10px] text-cream/60">{product.size}</span>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       </div>

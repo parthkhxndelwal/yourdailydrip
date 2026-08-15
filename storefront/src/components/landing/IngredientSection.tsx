@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
-import { PRODUCT_SLUG } from "@/lib/prelaunch";
+import { useMappedFeaturedProducts } from "@/lib/medusa-hooks";
 import { BenefitCards } from "./BenefitCards";
 import { Reveal } from "./Reveal";
 
@@ -98,6 +98,8 @@ function IngredientText({ ingredient }: { ingredient: Ingredient }) {
 }
 
 export function IngredientSection() {
+  const { data } = useMappedFeaturedProducts(1, true);
+  const product = data?.[0];
   return (
     <section id="ingredients" className="scroll-mt-28 bg-cream-soft py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
@@ -113,17 +115,19 @@ export function IngredientSection() {
                 A perfect blend of science and nature to strengthen roots, boost density and support
                 healthy hair growth.
               </p>
-              <Link
-                to="/product/$slug"
-                params={{ slug: PRODUCT_SLUG }}
-                className="group mt-8 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.25em] text-charcoal"
-              >
-                Discover Ingredients
-                <ArrowRight
-                  className="h-4 w-4 transition-transform group-hover:translate-x-1.5"
-                  strokeWidth={1.5}
-                />
-              </Link>
+              {product && (
+                <Link
+                  to="/product/$slug"
+                  params={{ slug: product.slug }}
+                  className="group mt-8 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.25em] text-charcoal"
+                >
+                  Discover Ingredients
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform group-hover:translate-x-1.5"
+                    strokeWidth={1.5}
+                  />
+                </Link>
+              )}
             </Reveal>
           </div>
 
