@@ -71,6 +71,10 @@ services:
       ITHINK_POLL_ENABLED: ${ITHINK_POLL_ENABLED:-true}
       ITHINK_DEFAULT_WEIGHT_KG: ${ITHINK_DEFAULT_WEIGHT_KG:-}
       ITHINK_TRACK_BASE_URL: ${ITHINK_TRACK_BASE_URL:-}
+      # Optional - without RESEND_API_KEY the notification module falls back
+      # to notification-local (logs only, no emails).
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-}
       # Required - the file-s3 provider (Cloudflare R2) will not boot without them.
       S3_ENDPOINT: ${S3_ENDPOINT:?}
       S3_BUCKET: ${S3_BUCKET:?}
