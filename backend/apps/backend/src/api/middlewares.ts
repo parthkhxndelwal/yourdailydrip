@@ -23,7 +23,7 @@ type PreorderVariantRow = { variant_id: string }
 
 type CartLineItem = { variant_id: string | null }
 
-async function blockMixedPreorderCart(
+export async function blockMixedPreorderCart(
   req: MedusaRequest,
   res: MedusaResponse,
   next: MedusaNextFunction
@@ -34,51 +34,62 @@ async function blockMixedPreorderCart(
     return
   }
 
-  const query = req.scope.resolve(ContainerRegistrationKeys.QUERY) as Query
+  try {
+    const query = req.scope.resolve(ContainerRegistrationKeys.QUERY) as Query
 
-  const { data: incomingPreorders } = await query.graph({
-    entity: "preorder_variant",
-    fields: ["variant_id"],
-    filters: { variant_id: variantId, status: "enabled" },
-  })
-  const incomingIsPreorder = incomingPreorders.length > 0
+    const { data: incomingPreorders } = await query.graph({
+      entity: "preorder_variant",
+      fields: ["variant_id"],
+      filters: { variant_id: variantId, status: "enabled" },
+    })
+    const incomingIsPreorder = incomingPreorders.length > 0
 
-  const { data: carts } = await query.graph({
-    entity: "cart",
-    fields: ["items.variant_id"],
-    filters: { id: req.params.id },
-  })
-  const cart = carts[0] as { items?: CartLineItem[] } | undefined
-  const existingVariantIds = (cart?.items ?? [])
-    .map((item) => item.variant_id)
-    .filter((itemVariantId): itemVariantId is string => Boolean(itemVariantId))
-  const existingIds = [...new Set(existingVariantIds)]
+    const { data: carts } = await query.graph({
+      entity: "cart",
+      fields: ["items.variant_id"],
+      filters: { id: req.params.id },
+    })
+    const cart = carts[0] as { items?: CartLineItem[] } | undefined
+    const existingVariantIds = (cart?.items ?? [])
+      .map((item) => item.variant_id)
+      .filter((itemVariantId): itemVariantId is string => Boolean(itemVariantId))
+    const existingIds = [...new Set(existingVariantIds)]
 
-  if (existingIds.length === 0) {
+    if (existingIds.length === 0) {
+      next()
+      return
+    }
+
+    const { data: existingRows } = await query.graph({
+      entity: "preorder_variant",
+      fields: ["variant_id"],
+      filters: { variant_id: existingIds, status: "enabled" },
+    })
+    const existingPreorderIds = new Set(
+      (existingRows as PreorderVariantRow[]).map((row) => row.variant_id)
+    )
+
+    const existingHasPreorder = existingIds.some((id) => existingPreorderIds.has(id))
+    const existingHasNormal = existingIds.some((id) => !existingPreorderIds.has(id))
+
+    if (
+      (incomingIsPreorder && existingHasNormal) ||
+      (!incomingIsPreorder && existingHasPreorder)
+    ) {
+      throw new MedusaError(MedusaError.Types.INVALID_DATA, MIXED_CART_ERROR_MESSAGE)
+    }
+
     next()
-    return
+  } catch (error) {
+    if (error instanceof MedusaError) {
+      throw error
+    }
+    // Fail open: this guard is a business rule, not an availability gate -
+    // infrastructure errors here must never 500 add-to-cart.
+    const logger = req.scope.resolve(ContainerRegistrationKeys.LOGGER)
+    logger.warn(`blockMixedPreorderCart skipped: ${(error as Error).message}`)
+    next()
   }
-
-  const { data: existingRows } = await query.graph({
-    entity: "preorder_variant",
-    fields: ["variant_id"],
-    filters: { variant_id: existingIds, status: "enabled" },
-  })
-  const existingPreorderIds = new Set(
-    (existingRows as PreorderVariantRow[]).map((row) => row.variant_id)
-  )
-
-  const existingHasPreorder = existingIds.some((id) => existingPreorderIds.has(id))
-  const existingHasNormal = existingIds.some((id) => !existingPreorderIds.has(id))
-
-  if (
-    (incomingIsPreorder && existingHasNormal) ||
-    (!incomingIsPreorder && existingHasPreorder)
-  ) {
-    throw new MedusaError(MedusaError.Types.INVALID_DATA, MIXED_CART_ERROR_MESSAGE)
-  }
-
-  next()
 }
 
 export default defineMiddlewares({
