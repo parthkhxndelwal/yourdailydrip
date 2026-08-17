@@ -1,5 +1,6 @@
 import { Leaf } from "lucide-react";
 
+import { isVideoUrl } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
 export function ProductImageGallery({
@@ -19,13 +20,27 @@ export function ProductImageGallery({
     <div>
       {image ? (
         <>
-          <img
-            src={image}
-            alt={`${name} — view ${active + 1}`}
-            width={900}
-            height={900}
-            className="aspect-square w-full rounded-2xl bg-sand object-cover"
-          />
+          {isVideoUrl(image) ? (
+            <video
+              src={image}
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label={`${name} — video ${active + 1}`}
+              className="aspect-square w-full rounded-2xl bg-sand object-contain"
+            />
+          ) : (
+            <img
+              src={image}
+              alt={`${name} — view ${active + 1}`}
+              width={900}
+              height={900}
+              className="aspect-square w-full rounded-2xl bg-sand object-contain"
+            />
+          )}
           {images.length > 1 && (
             <div className="mt-4 flex gap-3">
               {images.map((img, i) => (
@@ -38,7 +53,11 @@ export function ProductImageGallery({
                     i === active ? "border-primary" : "border-transparent",
                   )}
                 >
-                  <img src={img} alt="" width={80} height={80} loading="lazy" className="size-full object-cover" />
+                  {isVideoUrl(img) ? (
+                    <video src={img} muted playsInline preload="metadata" className="size-full object-cover" />
+                  ) : (
+                    <img src={img} alt="" width={80} height={80} loading="lazy" className="size-full object-cover" />
+                  )}
                 </button>
               ))}
             </div>

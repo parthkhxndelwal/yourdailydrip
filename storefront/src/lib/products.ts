@@ -45,3 +45,12 @@ export const formatPrice = (n: number) =>
 
 export const discountPct = (p: Product) =>
   p.mrp ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : 0;
+
+const VIDEO_EXTENSIONS = ["mp4", "webm", "mov", "m4v", "ogv"];
+
+export const isVideoUrl = (url: string): boolean => {
+  if (!url) return false;
+  const path = url.split(/[?#]/)[0] ?? "";
+  const ext = path.split(".").pop()?.toLowerCase() ?? "";
+  return VIDEO_EXTENSIONS.includes(ext);
+};
