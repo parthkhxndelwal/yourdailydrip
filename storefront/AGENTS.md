@@ -42,7 +42,6 @@ bun run lint / format
 | `index.tsx` | `/` | Pre-launch landing for Advanced Hair Density Serum (countdown to `PRELAUNCH_ENDS_AT` in `lib/prelaunch.ts`); own transparent navbar |
 | `shop.tsx` / `skin-care.tsx` / `hair-care.tsx` | `/shop`, `/skin-care`, `/hair-care` | Catalog grids via `<Collection>` (optional category filter) |
 | `product.$slug.tsx` | `/product/:slug` | PDP: gallery, info panel (price/MRP/benefits/ingredients/how-to-use/stock), add-to-cart, Buy Now, wishlist, reviews, related |
-| `cart.tsx` | `/cart` | Cart lines from `useShop()`, qty steppers, checkout gated behind auth (`CheckoutAuthModal`) |
 | `checkout.tsx` | `/checkout` | 2-step: address → payment. Auto-attaches CHEAPEST shipping option (no picker). Razorpay modal → `cart.complete` → `/order-confirmation?order=<id>` |
 | `order-confirmation.tsx` | `/order-confirmation` | Guest order lookup by `?order=`; items/totals/status/tracking section |
 | `track-order.tsx` | `/track-order` | AWB lookup via `useTrackShipment`; scan timeline, pending/not-found/error states |
@@ -63,13 +62,13 @@ bun run lint / format
 - `medusa-addresses.ts` - customer address book CRUD.
 - `razorpay.ts` - lazy `checkout.razorpay.com/v1/checkout.js` loader; only `{ type: "order" }` resolves; cancel/fail leave cart intact.
 - `products.ts` - shared product types + `formatPrice`/`discountPct` helpers ONLY. No catalog data lives here anymore - all product content (catalog, search, wishlist, PDP) is fetched live from Medusa via `medusa-hooks`.
-- `store.tsx` - `ShopProvider`/`useShop` context: cart + wishlist (`dd-wishlist` localStorage, debounced 400ms sync to `customer.metadata.wishlist` for signed-in users).
+- `store.tsx` - `ShopProvider`/`useShop` context: cart (+ `cartOpen`/`openCart`/`closeCart` driving the global `CartSheet`, which auto-opens on add-to-cart; the success toast was replaced by the sheet) + wishlist (`dd-wishlist` localStorage, debounced 400ms sync to `customer.metadata.wishlist` for signed-in users).
 
 **Invariants**: prices are INR integers end-to-end (749 = Rs 749), never divide/multiply; explicit `fields` on every Store API call; SDK bodies are plain objects, never `JSON.stringify`.
 
 ## Components (`src/components/`)
 
-- **Chrome**: `Header.tsx` (sticky, dropdown nav, live Medusa search dialog, wishlist/cart badges, logo), `AnnouncementBar.tsx` (promo marquee), `Footer.tsx` (dark forest green, socials, Shop/Company/Help columns, local-only newsletter), `Chatbot.tsx` (rule-based "Drippy"; **launcher hidden** via `.chat-toggle-hidden` in `styles.css` - remove that rule to re-enable).
+- **Chrome**: `Header.tsx` (sticky, dropdown nav, live Medusa search dialog, wishlist/cart badges, logo), `CartSheet.tsx` (global right-side cart drawer; auto-opens on add-to-cart, checkout gated behind `CheckoutAuthModal`), `AnnouncementBar.tsx` (promo marquee), `Footer.tsx` (dark forest green, socials, Shop/Company/Help columns, local-only newsletter), `Chatbot.tsx` (rule-based "Drippy"; **launcher hidden** via `.chat-toggle-hidden` in `styles.css` - remove that rule to re-enable).
 - **landing/**: transparent `Navbar.tsx`, countdown `AnnouncementBar.tsx`, Hero/Benefits/Ingredients/Promotion/Trust/FAQ sections, `Reveal.tsx` scroll-reveal.
 - **product/**: `Collection.tsx`, `ProductCard.tsx`, `ProductImageGallery.tsx`, `ProductInfoPanel.tsx`, `ProductReviewsSection.tsx`, `RelatedProductsSection.tsx`, skeletons.
 - **checkout/**: `StepIndicator.tsx`, `CheckoutAddressForm.tsx`, `CheckoutAuthModal.tsx`, `CheckoutSummary.tsx`, `PaymentStep.tsx`.

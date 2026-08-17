@@ -270,8 +270,8 @@ export function CheckoutAddressForm({
       )}
 
       <div className="mt-8 flex items-center justify-between gap-3">
-        <Link to="/cart" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
-          Back to cart
+        <Link to="/shop" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
+          Back to shop
         </Link>
         <Button type="submit" disabled={pending}>
           {pending && <Loader2 className="size-4 animate-spin" />}

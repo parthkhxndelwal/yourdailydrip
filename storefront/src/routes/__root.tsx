@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
+import { CartSheet } from "@/components/CartSheet";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Chatbot } from "@/components/Chatbot";
@@ -164,6 +165,7 @@ function RootComponent() {
         </main>
         <Footer />
         <Chatbot />
+        <CartSheet />
         <Toaster position="top-center" />
       </ShopProvider>
     </QueryClientProvider>

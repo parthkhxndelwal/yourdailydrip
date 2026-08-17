@@ -104,10 +104,8 @@ export function ProductInfoPanel({
         >
           Add to Cart
         </Button>
-        <Button asChild disabled={product.stock === 0}>
-          <Link to="/cart" onClick={onBuyNow}>
-            Buy Now
-          </Link>
+        <Button disabled={product.stock === 0} onClick={onBuyNow}>
+          Buy Now
         </Button>
         <Button
           variant="ghost"

@@ -152,7 +152,7 @@ function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
 }
 
 export function Header() {
-  const { cartCount, wishlist } = useShop();
+  const { cartCount, wishlist, openCart } = useShop();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -223,15 +223,15 @@ export function Header() {
               )}
             </Link>
           </Button>
-          <Button variant="ghost" size="icon" aria-label="Cart" asChild>
-            <Link to="/cart" className="relative">
+          <Button variant="ghost" size="icon" aria-label="Cart" onClick={openCart}>
+            <span className="relative">
               <ShoppingBag />
               {cartCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 grid size-4 place-items-center rounded-full bg-accent text-[10px] font-semibold text-accent-foreground">
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </span>
           </Button>
           <Button variant="outline" size="sm" asChild className="ml-1 hidden sm:inline-flex">
             <Link to="/account">

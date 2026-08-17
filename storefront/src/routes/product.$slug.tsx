@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { ProductImageGallery } from "@/components/ProductImageGallery";
@@ -24,6 +24,7 @@ export const Route = createFileRoute("/product/$slug")({
 function ProductPage() {
   const { slug } = Route.useParams();
   const { addToCart, toggleWishlist, inWishlist } = useShop();
+  const navigate = useNavigate();
   const productQuery = useMappedProduct(slug);
   const relatedQuery = useMappedProducts(productQuery.data?.category);
   const [active, setActive] = useState(0);
@@ -77,7 +78,10 @@ function ProductPage() {
           onAddToCart={() => {
             addToCart(product, qty);
           }}
-          onBuyNow={() => addToCart(product, qty, { showSuccessToast: false })}
+          onBuyNow={() => {
+            addToCart(product, qty, { showSuccessToast: false });
+            navigate({ to: "/checkout" });
+          }}
           onToggleWishlist={() => {
             toggleWishlist(product.slug);
             toast(inWishlist(product.slug) ? "Removed from wishlist" : "Saved to wishlist");

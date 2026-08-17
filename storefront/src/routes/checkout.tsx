@@ -95,7 +95,7 @@ function CheckoutPage() {
         <CheckoutAuthModal
           open
           onOpenChange={(open) => {
-            if (!open) navigate({ to: "/cart" });
+            if (!open) navigate({ to: "/shop" });
           }}
           onAuthenticated={() => {}}
         />

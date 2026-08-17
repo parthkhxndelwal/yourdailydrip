@@ -40,6 +40,9 @@ type ShopState = {
   clearWishlist: () => void;
   inWishlist: (slug: string) => boolean;
   cartCount: number;
+  cartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
 };
 
 const ShopContext = createContext<ShopState | null>(null);
@@ -57,6 +60,7 @@ const read = <T,>(key: string, fallback: T): T => {
 export function ShopProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const customerQuery = useCustomer();
@@ -130,12 +134,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         .mutateAsync({ variantId: product.variantId, quantity: qty })
         .then(() => {
           if (options?.showSuccessToast !== false) {
-            toast.success(`${product.name} added to cart`);
+            setCartOpen(true);
           }
         })
         .catch(() => toast.error("Couldn't add to cart. Please try again."));
     },
-    [addMutation],
+    [addMutation, setCartOpen],
   );
 
   const setQty = useCallback(
@@ -175,6 +179,9 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const openCart = useCallback(() => setCartOpen(true), []);
+  const closeCart = useCallback(() => setCartOpen(false), []);
+
   const value = useMemo<ShopState>(
     () => ({
       cart,
@@ -187,8 +194,11 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       clearWishlist,
       inWishlist: (slug: string) => wishlist.includes(slug),
       cartCount: cart.reduce((n, l) => n + l.quantity, 0),
+      cartOpen,
+      openCart,
+      closeCart,
     }),
-    [cart, cartQuery.isError, wishlist, addToCart, setQty, removeFromCart, toggleWishlist, clearWishlist],
+    [cart, cartQuery.isError, wishlist, addToCart, setQty, removeFromCart, toggleWishlist, clearWishlist, cartOpen, openCart, closeCart],
   );
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

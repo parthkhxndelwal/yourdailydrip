@@ -13,7 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as BlogsRouteImport } from './routes/blogs'
-import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as HairCareRouteImport } from './routes/hair-care'
 import { Route as HowToUseRouteImport } from './routes/how-to-use'
@@ -47,11 +46,6 @@ const AccountRoute = AccountRouteImport.update({
 const BlogsRoute = BlogsRouteImport.update({
   id: '/blogs',
   path: '/blogs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CartRoute = CartRouteImport.update({
-  id: '/cart',
-  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -130,7 +124,6 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/blogs': typeof BlogsRoute
-  '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/hair-care': typeof HairCareRoute
   '/how-to-use': typeof HowToUseRoute
@@ -151,7 +144,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/blogs': typeof BlogsRoute
-  '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/hair-care': typeof HairCareRoute
   '/how-to-use': typeof HowToUseRoute
@@ -173,7 +165,6 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/blogs': typeof BlogsRoute
-  '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/hair-care': typeof HairCareRoute
   '/how-to-use': typeof HowToUseRoute
@@ -196,7 +187,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/blogs'
-    | '/cart'
     | '/checkout'
     | '/hair-care'
     | '/how-to-use'
@@ -217,7 +207,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/blogs'
-    | '/cart'
     | '/checkout'
     | '/hair-care'
     | '/how-to-use'
@@ -238,7 +227,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/blogs'
-    | '/cart'
     | '/checkout'
     | '/hair-care'
     | '/how-to-use'
@@ -260,7 +248,6 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
   BlogsRoute: typeof BlogsRoute
-  CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   HairCareRoute: typeof HairCareRoute
   HowToUseRoute: typeof HowToUseRoute
@@ -305,13 +292,6 @@ declare module '@tanstack/react-router' {
       path: '/blogs'
       fullPath: '/blogs'
       preLoaderRoute: typeof BlogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -420,7 +400,6 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
   BlogsRoute: BlogsRoute,
-  CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   HairCareRoute: HairCareRoute,
   HowToUseRoute: HowToUseRoute,
