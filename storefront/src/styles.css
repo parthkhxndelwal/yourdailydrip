@@ -98,8 +98,8 @@
   --leaf: oklch(0.55 0.11 148);
   --deep: oklch(0.24 0.05 152);
   --sand: oklch(0.94 0.03 88);
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-body: "Manrope", system-ui, sans-serif;
+  --font-display: "Montserrat", system-ui, sans-serif;
+  --font-body: "Roboto", system-ui, sans-serif;
   --gradient-forest: linear-gradient(140deg, oklch(0.28 0.06 152), oklch(0.42 0.09 150));
   --shadow-soft: 0 18px 45px -25px oklch(0.24 0.05 152 / 0.45);
   --forest: #0B1710;
