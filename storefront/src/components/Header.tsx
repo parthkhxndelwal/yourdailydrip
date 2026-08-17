@@ -158,32 +158,16 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-        <div className="flex items-center gap-2">
-          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <SheetTrigger asChild className="lg:hidden">
-              <Button variant="ghost" size="icon" aria-label="Open menu">
-                <Menu />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-6">
-              <SheetTitle className="font-display text-xl">Daily Drip</SheetTitle>
-              <nav className="mt-6 flex flex-col gap-4">
-              <Link to="/shop" className={navLink} onClick={() => setMenuOpen(false)}>Shop All</Link>
-              <Link to="/hair-care" className={navLink} onClick={() => setMenuOpen(false)}>Hair Care</Link>
-                <Link to="/track-order" className={navLink} onClick={() => setMenuOpen(false)}>Track Order</Link>
-                <Link to="/blogs" className={navLink} onClick={() => setMenuOpen(false)}>Blogs</Link>
-                <Link to="/account" className={navLink} onClick={() => setMenuOpen(false)}>Account / Sign Up</Link>
-              </nav>
-            </SheetContent>
-          </Sheet>
-
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 md:px-8">
+        {/* Left — logo */}
+        <div className="justify-self-start">
           <Link to="/" className="flex shrink-0 items-center" aria-label="Daily Drip home">
             <img src="/dailydrip_logo.png" alt="Daily Drip" className="h-14 w-auto" />
           </Link>
         </div>
 
-        <div className="flex items-center gap-6">
+        {/* Center — desktop nav */}
+        <div className="justify-self-center">
           <nav className="hidden items-center gap-6 lg:flex">
             <DropdownMenu>
               <DropdownMenuTrigger className={navLink + " flex items-center gap-1 outline-none"}>
@@ -209,37 +193,55 @@ export function Header() {
               <Package size={14} /> Track Order
             </Link>
           </nav>
+        </div>
 
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" aria-label="Search" onClick={() => setSearchOpen(true)}>
-              <Search />
-            </Button>
-            <Button variant="ghost" size="icon" aria-label="Wishlist" asChild>
-              <Link to="/wishlist" className="relative">
-                <Heart />
-                {wishlist.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 grid size-4 place-items-center rounded-full bg-accent text-[10px] font-semibold text-accent-foreground">
-                    {wishlist.length}
-                  </span>
-                )}
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" aria-label="Cart" onClick={openCart}>
-              <span className="relative">
-                <ShoppingBag />
-                {cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 grid size-4 place-items-center rounded-full bg-accent text-[10px] font-semibold text-accent-foreground">
-                    {cartCount}
-                  </span>
-                )}
-              </span>
-            </Button>
-            <Button variant="outline" size="sm" asChild className="ml-1 hidden sm:inline-flex">
-              <Link to="/account">
-                <User size={15} /> Account
-              </Link>
-            </Button>
-          </div>
+        {/* Right — icons */}
+        <div className="flex items-center gap-1 justify-self-end">
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild className="lg:hidden">
+              <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Menu />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72 p-6">
+              <SheetTitle className="font-display text-xl">Daily Drip</SheetTitle>
+              <nav className="mt-6 flex flex-col gap-4">
+              <Link to="/shop" className={navLink} onClick={() => setMenuOpen(false)}>Shop All</Link>
+              <Link to="/hair-care" className={navLink} onClick={() => setMenuOpen(false)}>Hair Care</Link>
+                <Link to="/track-order" className={navLink} onClick={() => setMenuOpen(false)}>Track Order</Link>
+                <Link to="/blogs" className={navLink} onClick={() => setMenuOpen(false)}>Blogs</Link>
+                <Link to="/account" className={navLink} onClick={() => setMenuOpen(false)}>Account / Sign Up</Link>
+              </nav>
+            </SheetContent>
+          </Sheet>
+          <Button variant="ghost" size="icon" aria-label="Search" onClick={() => setSearchOpen(true)}>
+            <Search />
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Wishlist" asChild>
+            <Link to="/wishlist" className="relative">
+              <Heart />
+              {wishlist.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 grid size-4 place-items-center rounded-full bg-accent text-[10px] font-semibold text-accent-foreground">
+                  {wishlist.length}
+                </span>
+              )}
+            </Link>
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Cart" onClick={openCart}>
+            <span className="relative">
+              <ShoppingBag />
+              {cartCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 grid size-4 place-items-center rounded-full bg-accent text-[10px] font-semibold text-accent-foreground">
+                  {cartCount}
+                </span>
+              )}
+            </span>
+          </Button>
+          <Button variant="outline" size="sm" asChild className="ml-1 hidden sm:inline-flex">
+            <Link to="/account">
+              <User size={15} /> Account
+            </Link>
+          </Button>
         </div>
       </div>
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
