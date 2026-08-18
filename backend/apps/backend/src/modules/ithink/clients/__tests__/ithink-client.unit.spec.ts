@@ -157,6 +157,15 @@ describe("buildOrderBody", () => {
     const shipment = (body.shipments as Record<string, unknown>[])[0]
     expect(shipment.return_address_id).toBe("")
   })
+
+  it("sends reseller_name from the params, defaulting to an empty string", () => {
+    const body = buildOrderBody({ ...orderParams, resellerName: "Daily Drip" })
+    const shipment = (body.shipments as Record<string, unknown>[])[0]
+    expect(shipment.reseller_name).toBe("Daily Drip")
+    const plainBody = buildOrderBody(orderParams)
+    const plainShipment = (plainBody.shipments as Record<string, unknown>[])[0]
+    expect(plainShipment.reseller_name).toBe("")
+  })
 })
 
 describe("buildSyncOrderBody", () => {
@@ -192,6 +201,15 @@ describe("buildSyncOrderBody", () => {
     })
     const shipment = (body.shipments as Record<string, unknown>[])[0]
     expect(shipment.return_address_id).toBe("return-1")
+  })
+
+  it("sends reseller_name from client options", () => {
+    const body = buildSyncOrderBody(orderParamsForAddOrder(), {
+      ...options,
+      resellerName: "Daily Drip",
+    })
+    const shipment = (body.shipments as Record<string, unknown>[])[0]
+    expect(shipment.reseller_name).toBe("Daily Drip")
   })
 })
 

@@ -76,10 +76,12 @@ describe("resolveProviderOptions", () => {
     const resolved = resolveProviderOptions({
       ...baseOptions,
       gst_number: "27ABCDE1234F1Z5",
+      reseller_name: "Daily Drip",
       default_weight_kg: 1,
     })
     expect(resolved.pickup_address_id).toBe("addr-test")
     expect(resolved.gst_number).toBe("27ABCDE1234F1Z5")
+    expect(resolved.reseller_name).toBe("Daily Drip")
     expect(resolved.default_weight_kg).toBe(1)
   })
 })

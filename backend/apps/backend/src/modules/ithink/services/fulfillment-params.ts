@@ -58,6 +58,7 @@ export function buildOrderParams(input: BuildOrderParamsInput): AddOrderParams {
     ),
     pickupAddressId: input.options.pickup_address_id,
     gstNumber: input.options.gst_number,
+    resellerName: input.options.reseller_name,
     logistics: input.logistics,
   }
 }

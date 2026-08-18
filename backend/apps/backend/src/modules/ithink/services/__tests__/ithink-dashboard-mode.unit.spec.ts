@@ -18,6 +18,7 @@ const dashboardOptions: IthinkProviderOptions = {
   secret_key: "key-test",
   pickup_address_id: "addr-test",
   gst_number: "27ABCDE1234F1Z5",
+  reseller_name: "Daily Drip",
   mode: "dashboard",
   return_address_id: "return-1",
   order_no_prefix: "YDD-",
@@ -148,6 +149,7 @@ describe("IthinkFulfillmentService dashboard-mode createFulfillment", () => {
       expect(shipment.order).toBe("YDD-1001")
       expect(shipment.payment_mode).toBe("Prepaid")
       expect(shipment.return_address_id).toBe("return-1")
+      expect(shipment.reseller_name).toBe("Daily Drip")
       expect(result.data.refnum).toBe("REF-1")
       expect(result.data.order_no).toBe("YDD-1001")
       expect(result.data).not.toHaveProperty("awb")

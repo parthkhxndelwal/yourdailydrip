@@ -106,6 +106,7 @@ modules: [
 | `order_no_prefix` | string | `""` | no | `"YDD-"` |
 | `poll_enabled` | boolean | `true` | no | `true` |
 | `gst_number` | string | (none) | no | `"GSTIN12345"` |
+| `reseller_name` | string | `""` | yes | `"Daily Drip"` |
 | `default_weight_kg` | number | `0.5` | no | `0.5` |
 | `default_length_cm` | number | `20` | no | `20` |
 | `default_width_cm` | number | `15` | no | `15` |
@@ -114,6 +115,9 @@ modules: [
 Notes:
 
 - `base_url` must include the `/api_v3` segment.
+- `reseller_name` is required by iThink on every shipment (order/sync.json and
+  order/add.json reject the payload when the field is absent); the field is
+  always sent, defaulting to an empty string when the option is unset.
 - `return_address_id` is required in dashboard mode: `createFulfillment`
   throws without it, so never configure it as an empty string.
 - `default_weight_kg` and the dimension defaults are used when the cart
@@ -330,6 +334,7 @@ Environment changes:
 | Variable | Status | Notes |
 | --- | --- | --- |
 | `ITHINK_MODE` | new | `"dashboard"` (default) or `"book"`. |
+| `ITHINK_RESELLER_NAME` | new | Store name sent as the shipment `reseller_name` field. iThink rejects requests without it - set it to the store name on your iThink account (e.g. `"Daily Drip"`). |
 | `ITHINK_RETURN_ADDRESS_ID` | new | Required in dashboard mode; the old integration sent an empty string, which dashboard mode rejects. |
 | `ITHINK_ORDER_NO_PREFIX` | new | Optional prefix for the `order_no` sent to iThink (default empty). |
 | `ITHINK_POLL_ENABLED` | new | `"false"` disables the reconciliation job; default `true`. |

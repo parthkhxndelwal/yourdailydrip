@@ -18,6 +18,7 @@ export type IthinkProviderOptions = {
   default_width_cm?: number
   default_height_cm?: number
   gst_number?: string
+  reseller_name?: string
   mode?: IthinkMode
   return_address_id?: string
   order_no_prefix?: string
@@ -63,6 +64,7 @@ export function toClientOptions(options: IthinkProviderOptions): IthinkClientOpt
     defaultHeightCm: options.default_height_cm ?? DEFAULT_DIMENSIONS_CM.height,
     mode: options.mode ?? "dashboard",
     returnAddressId: options.return_address_id,
+    resellerName: options.reseller_name,
     orderNoPrefix: options.order_no_prefix ?? "",
     pollEnabled: options.poll_enabled ?? true,
   }

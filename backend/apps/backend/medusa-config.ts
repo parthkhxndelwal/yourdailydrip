@@ -109,6 +109,7 @@ module.exports = defineConfig({
               secret_key: process.env.ITHINK_SECRET_KEY,
               pickup_address_id: process.env.ITHINK_PICKUP_ADDRESS_ID,
               gst_number: process.env.ITHINK_GST_NUMBER,
+              reseller_name: process.env.ITHINK_RESELLER_NAME,
               default_weight_kg: ithinkWeightOption,
               mode: ithinkMode,
               return_address_id: ithinkReturnAddressId,

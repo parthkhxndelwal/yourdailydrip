@@ -13,7 +13,9 @@ export type IthinkClientOptions = {
   // "book" books immediately via order/add.json. Defaults to "dashboard".
   mode?: IthinkMode
   returnAddressId?: string
+  // Reseller/store name iThink requires on every shipment ("reseller_name").
   orderNoPrefix?: string
+  resellerName?: string
   pollEnabled?: boolean
   fetchImpl?: typeof fetch
 }
@@ -75,6 +77,9 @@ export type AddOrderParams = {
   pickupAddressId: string
   // Store GST number, sent as the shipment's `gst_number` field.
   gstNumber?: string
+  // Reseller/store name, sent as the shipment's `reseller_name` field
+  // (required by iThink on order/sync.json and order/add.json).
+  resellerName?: string
   // Selected logistics carrier (logistic_name from the shipping option data).
   // Sent as the top-level `logistics` key of the order/add.json data envelope.
   logistics?: string

@@ -49,7 +49,7 @@ export function buildRateBody(params: RateCheckParams): Record<string, unknown> 
 
 function shipmentBody(
   params: AddOrderParams,
-  options?: { returnAddressId?: string }
+  options?: { returnAddressId?: string; resellerName?: string }
 ): Record<string, unknown> {
   return {
     waybill: "",
@@ -92,6 +92,9 @@ function shipmentBody(
     cod_charges: "0",
     advance_amount: "0",
     cod_amount: "0",
+    // reseller_name is a required per-shipment field on order/sync.json and
+    // order/add.json; iThink rejects the payload when it is absent.
+    reseller_name: params.resellerName ?? options?.resellerName ?? "",
     // eway_bill_number is generated per-shipment by iThink only when the
     // consignment value exceeds the statutory threshold (Rs. 50,000); the
     // store provides only its GST number.
