@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Leaf } from "lucide-react";
 
 import { isVideoUrl } from "@/lib/products";
@@ -16,6 +17,48 @@ export function ProductImageGallery({
 }) {
   const image = images[active];
 
+  // Frame gradient extracted from the active image's palette (LightVibrant →
+  // LightMuted → Muted). Stays null (bg-sand fallback) until extraction
+  // succeeds; extraction is client-only (node-vibrant needs canvas/DOM), so
+  // the module is dynamically imported inside the effect to keep it out of
+  // the SSR bundle.
+  const [gradient, setGradient] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Videos have no extractable frame color.
+    if (!image || isVideoUrl(image)) {
+      setGradient(null);
+      return;
+    }
+
+    let cancelled = false;
+    setGradient(null);
+
+    (async () => {
+      try {
+        const { Vibrant } = await import("node-vibrant/browser");
+        const palette = await Vibrant.from(image).getPalette();
+        if (cancelled) return;
+
+        // Skip null swatches; keep LightVibrant → LightMuted → Muted order.
+        const colors = [palette.LightVibrant, palette.LightMuted, palette.Muted]
+          .map((swatch) => swatch?.hex)
+          .filter((hex): hex is string => Boolean(hex));
+
+        if (colors.length > 0) {
+          setGradient(`linear-gradient(135deg, ${colors.join(", ")})`);
+        }
+      } catch {
+        // CORS/load failure (e.g. cross-origin image without CORS headers) —
+        // keep the bg-sand fallback.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [image]);
+
   return (
     <div>
       {image ? (
@@ -33,13 +76,23 @@ export function ProductImageGallery({
               className="aspect-square w-full rounded-2xl bg-sand object-contain"
             />
           ) : (
-            <img
-              src={image}
-              alt={`${name} — view ${active + 1}`}
-              width={900}
-              height={900}
-              className="aspect-square w-full rounded-2xl bg-sand object-contain"
-            />
+            <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-sand">
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 transition-opacity duration-700"
+                style={{
+                  background: gradient ?? undefined,
+                  opacity: gradient ? 1 : 0,
+                }}
+              />
+              <img
+                src={image}
+                alt={`${name} — view ${active + 1}`}
+                width={900}
+                height={900}
+                className="relative size-full object-contain"
+              />
+            </div>
           )}
           {images.length > 1 && (
             <div className="mt-4 flex gap-3">
