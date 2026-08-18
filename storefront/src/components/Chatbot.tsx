@@ -27,7 +27,7 @@ function answer(q: string): string {
     return "Massage Rooted Hair Growth Oil into the scalp twice a week, leave for 1–2 hours, then wash with Everyday Gentle Shampoo. For flaking, add Balance Scalp Tonic daily.";
   if (t.includes("ship") || t.includes("free"))
     return "Shipping charges are calculated at checkout based on your delivery pincode and shown before you pay. Orders placed before 4 PM IST are dispatched the same day.";
-  return "Happy to help! You can ask me about orders, shipping, returns, or which product suits your skin or hair type. For anything else, write to care@dailydrip.in.";
+  return "Happy to help! You can ask me about orders, shipping, returns, or which product suits your skin or hair type. For anything else, write to contact@yourdailydrip.com.";
 }
 
 export function Chatbot() {

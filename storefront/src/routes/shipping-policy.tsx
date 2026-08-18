@@ -14,7 +14,7 @@ export const Route = createFileRoute("/shipping-policy")({
   component: () => (
     <PageShell eyebrow="Policies" title="Shipping Policy" intro="Everything about how and when your order reaches you.">
       <Section heading="Dispatch">
-        <p>Orders placed before 4 PM IST on a working day are dispatched the same day from our Bengaluru warehouse. Orders after that go out the next working day.</p>
+        <p>Orders placed before 4 PM IST on a working day are dispatched the same day from our Mumbai warehouse. Orders after that go out the next working day.</p>
       </Section>
       <Section heading="Delivery estimates">
         <ul className="list-disc space-y-1.5 pl-5">
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/shipping-policy")({
         <p>
           A tracking link is sent by email and SMS at dispatch, and you can check status on
           the Track Order page. If a parcel arrives damaged or tampered with, refuse delivery
-          where possible and email care@dailydrip.in within 48 hours with photos — we ship a
+          where possible and email contact@yourdailydrip.com within 48 hours with photos — we ship a
           free replacement.
         </p>
       </Section>

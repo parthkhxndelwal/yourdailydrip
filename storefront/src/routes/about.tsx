@@ -6,16 +6,16 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About Us — Daily Drip" },
-      { name: "description", content: "Who we are: a small Bengaluru team making dermatologist-tested skin and hair care with fully disclosed formulas." },
+      { name: "description", content: "Who we are: a small Mumbai team making dermatologist-tested skin and hair care with fully disclosed formulas." },
       { property: "og:title", content: "About Us — Daily Drip" },
-      { property: "og:description", content: "A small Bengaluru team making honest skin and hair care." },
+      { property: "og:description", content: "A small Mumbai team making honest skin and hair care." },
     ],
   }),
   component: () => (
     <PageShell
       eyebrow="Company overview"
       title="About Daily Drip"
-      intro="A small Bengaluru team making skin and hair care we're happy to put on our own families."
+      intro="A small Mumbai team making skin and hair care we're happy to put on our own families."
     >
       <Section heading="What we do">
         <p>
@@ -41,8 +41,8 @@ export const Route = createFileRoute("/about")({
       </Section>
       <Section heading="Talk to us">
         <p>
-          Questions, complaints or ingredient queries go to care@dailydrip.in or
-          +91 80001 12233, Monday to Saturday, 9 AM to 7 PM IST. A real person replies
+          Questions, complaints or ingredient queries go to contact@yourdailydrip.com or
+          +91 93240 08663, Monday to Saturday, 9 AM to 7 PM IST. A real person replies
           within one working day.
         </p>
       </Section>

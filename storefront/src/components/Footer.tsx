@@ -1,13 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+import { ArrowRight, Instagram, Linkedin } from "lucide-react";
 
 const socials = [
-  { label: "Instagram", href: "https://instagram.com/dailydrip", Icon: Instagram },
-  { label: "Facebook", href: "https://facebook.com/dailydrip", Icon: Facebook },
-  { label: "YouTube", href: "https://youtube.com/@dailydrip", Icon: Youtube },
-  { label: "X (Twitter)", href: "https://x.com/dailydrip", Icon: Twitter },
-  { label: "LinkedIn", href: "https://linkedin.com/company/dailydrip", Icon: Linkedin },
+  { label: "Instagram", href: "https://www.instagram.com/your_dailydrip", Icon: Instagram },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/daily-drip-9094473b8/", Icon: Linkedin },
 ];
 
 const shopLinks = [
@@ -113,11 +110,25 @@ export function Footer() {
                 </a>
               ))}
             </div>
-            <p className="mt-6 text-xs leading-relaxed text-cream/40">
-              care@dailydrip.in · +91 80001 12233
-              <br />
-              Bengaluru, India
-            </p>
+            <div className="mt-6 space-y-1 text-xs leading-relaxed text-cream/40">
+              <a
+                href="mailto:contact@yourdailydrip.com"
+                className="block transition-colors duration-200 hover:text-sage"
+              >
+                contact@yourdailydrip.com
+              </a>
+              <a
+                href="tel:+919324008663"
+                className="block transition-colors duration-200 hover:text-sage"
+              >
+                +91 93240 08663
+              </a>
+              <p>
+                GA73, The Zone Mall, Aaman Adarsh Nagar,
+                <br />
+                Chandavarkar Lane, Mumbai, Maharashtra - 400092
+              </p>
+            </div>
           </div>
 
           <div>
@@ -141,7 +152,7 @@ export function Footer() {
               ))}
               <li>
                 <a
-                  href="mailto:care@dailydrip.in"
+                  href="mailto:contact@yourdailydrip.com"
                   className="transition-colors duration-200 hover:text-sage"
                 >
                   Contact Us

@@ -175,7 +175,7 @@ function TrackOrder() {
       )}
 
       <p className="text-sm text-muted-foreground">
-        Tracking not updating? Write to care@dailydrip.in with your tracking number and we'll
+        Tracking not updating? Write to contact@yourdailydrip.com with your tracking number and we'll
         respond within one working day.
       </p>
     </PageShell>

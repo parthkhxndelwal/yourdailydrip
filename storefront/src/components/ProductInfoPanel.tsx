@@ -160,7 +160,7 @@ export function ProductInfoPanel({
           <AccordionTrigger>Shipping, returns &amp; refunds</AccordionTrigger>
           <AccordionContent className="space-y-2 text-muted-foreground">
             <p>
-              Dispatched from Bengaluru within 24 hours. Metro cities receive orders in
+              Dispatched from Mumbai within 24 hours. Metro cities receive orders in
               2–3 working days, rest of India in 4–6.
             </p>
             <p>

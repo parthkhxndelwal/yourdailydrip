@@ -14,7 +14,7 @@ export const Route = createFileRoute("/returns")({
   component: () => (
     <PageShell eyebrow="Policies" title="Return &amp; Refund Policy" intro="Simple rules, no hidden conditions.">
       <Section heading="Return window">
-        <p>Unopened products with intact seals can be returned within 14 days of delivery. Raise the request from your account or email care@dailydrip.in with your order ID.</p>
+        <p>Unopened products with intact seals can be returned within 14 days of delivery. Raise the request from your account or email contact@yourdailydrip.com with your order ID.</p>
       </Section>
       <Section heading="Damaged, wrong or missing items">
         <p>Report within 48 hours of delivery with photos. We ship a replacement at no cost, or refund in full if you prefer.</p>

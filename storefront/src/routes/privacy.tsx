@@ -46,7 +46,7 @@ export const Route = createFileRoute("/privacy")({
       <Section heading="Retention and your rights">
         <p>
           Order records are retained as long as tax law requires. You can request access,
-          correction or deletion of your data by writing to care@dailydrip.in; we respond
+          correction or deletion of your data by writing to contact@yourdailydrip.com; we respond
           within 30 days.
         </p>
       </Section>

@@ -67,7 +67,7 @@ export const Route = createFileRoute("/terms")({
       <Section heading="Governing law">
         <p>
           These terms are governed by the laws of India. Any dispute will be subject to the
-          exclusive jurisdiction of the courts of Bengaluru, Karnataka.
+          exclusive jurisdiction of the courts of Mumbai, Maharashtra.
         </p>
       </Section>
     </PageShell>
