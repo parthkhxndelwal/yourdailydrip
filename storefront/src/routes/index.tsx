@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { BrandStatement } from "@/components/landing/BrandStatement";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { IngredientSection } from "@/components/landing/IngredientSection";
@@ -40,6 +41,7 @@ function LandingPage() {
       <IngredientSection />
       <PromotionBanner />
       <TrustSection />
+      <BrandStatement />
       <FaqSection />
     </>
   );

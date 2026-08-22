@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowRight, FlaskConical, MapPin, ShieldCheck } from "lucide-react";
+import { ArrowRight, Droplets, FlaskConical, Heart, ShieldCheck } from "lucide-react";
 
 import hero from "@/assets/hero.jpg";
 import { useMappedFeaturedProducts } from "@/lib/medusa-hooks";
@@ -8,9 +8,10 @@ import { discountPct, formatPrice } from "@/lib/products";
 import { Reveal } from "./Reveal";
 
 const TRUST_POINTS = [
-  { Icon: ShieldCheck, label: "Safe & Tested" },
-  { Icon: FlaskConical, label: "Dermatologically Tested" },
-  { Icon: MapPin, label: "Made for Indian Hair" },
+  { Icon: ShieldCheck, label: "Dermatologist Recommended" },
+  { Icon: Heart, label: "Cruelty Free" },
+  { Icon: Droplets, label: "Non-Comedogenic" },
+  { Icon: FlaskConical, label: "Safe & Tested" },
 ] as const;
 
 export function PromotionBanner() {
@@ -42,12 +43,12 @@ export function PromotionBanner() {
               {/* Offer copy */}
               <div>
                 <p className="text-[11px] uppercase tracking-[0.35em] text-gold">
-                  Limited Edition Pre-Launch
+                  Exclusive Pre-Launch Access
                 </p>
                 <h3 className="mt-4 font-display text-3xl leading-tight text-cream md:text-4xl">
                   Pre-Launch Sale is Live!
                 </h3>
-                <p className="mt-3 text-cream/70">Limited time offer. Limited stock.</p>
+                <p className="mt-3 text-cream/70">Be among the first to experience our 18% Hair Growth Actives formula.</p>
 
                 <div className="mt-7 flex flex-wrap items-center gap-x-9 gap-y-6">
                   {product ? (

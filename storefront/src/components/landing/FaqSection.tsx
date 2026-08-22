@@ -8,28 +8,36 @@ import { Reveal } from "./Reveal";
 
 const FAQS = [
   {
-    q: "What is the Advanced Hair Density Serum?",
-    a: "A leave-on scalp serum built around 14 science-backed actives — Procapil®, Redensyl®, Anagain™ and more — formulated to strengthen roots and support visibly denser, healthier-looking hair with daily use.",
+    q: "What is Daily Drip Hair Growth Actives?",
+    a: "A leave-on scalp roll-on powered by 18% Hair Growth Actives and our 360° Follicle Science Technology, formulated to support scalp health, stronger roots and fuller-looking, healthier hair.",
+  },
+  {
+    q: "What makes the formula different?",
+    a: "It combines 7 globally patented actives with a targeted blend of advanced hair-care ingredients, including Procapil®, Redensyl®, Anagain™, Capilia Longa®, Baicapil® and more.",
   },
   {
     q: "How do I use it?",
-    a: "Apply 4–6 drops to a dry or slightly damp scalp, massage in for about a minute and leave on. No rinsing required. Use once daily — ideally at night — and stay consistent.",
+    a: "Part your hair to expose the scalp, roll the applicator directly onto the target areas for 2 minutes, use twice daily, and leave it on to absorb naturally.",
+  },
+  {
+    q: "Is it suitable for all scalp types?",
+    a: "The product is labelled as suitable for all scalp types. If you have a sensitive scalp or existing scalp condition, consider a patch test before use.",
+  },
+  {
+    q: "When can I expect to see results?",
+    a: "Hair and scalp routines require consistency. Results can vary from person to person, so regular use as directed is important.",
+  },
+  {
+    q: "Is it non-comedogenic and cruelty-free?",
+    a: "Yes — these are claims displayed on the product packaging.",
+  },
+  {
+    q: "Is Daily Drip dermatologist recommended?",
+    a: "Yes, the product packaging carries the Dermatologist Recommended claim.",
   },
   {
     q: "When will my pre-order ship?",
-    a: "Pre-orders ship before launch day, in the order they were placed. You'll get a tracking link by email the moment your bottle leaves our warehouse.",
-  },
-  {
-    q: "Is it safe for daily use and all hair types?",
-    a: "Yes. It's dermatologically tested, free of sulfates, parabens and silicones, and formulated for straight, wavy, curly and coily hair. If you have a sensitive scalp, do a small patch test first.",
-  },
-  {
-    q: "What if I don't see results?",
-    a: "Hair cycles take time — commit to at least 90 days of consistent use. And if you're not happy within 30 days of receiving your order, write to us and we'll refund you in full. No questions asked.",
-  },
-  {
-    q: "Is it really free of sulfates, parabens and silicones?",
-    a: "Completely. Every ingredient is listed on the pack and on this page at meaningful percentages — no hidden fillers, no fine print.",
+    a: "Pre-orders will be dispatched after launch. Delivery timelines vary by pincode and courier serviceability. You’ll receive tracking details once your order is shipped.",
   },
 ] as const;
 
@@ -39,10 +47,10 @@ export function FaqSection() {
       <div className="mx-auto max-w-3xl px-4 md:px-8">
         <Reveal>
           <h2 className="text-center font-display text-3xl text-charcoal md:text-4xl">
-            Questions, answered.
+            Everything You Need to Know.
           </h2>
           <p className="mt-3 text-center text-forest/60">
-            Everything you need to know before you pre-order.
+            Your Daily Drip questions, answered.
           </p>
 
           <Accordion type="single" collapsible className="mt-10">

@@ -1,4 +1,4 @@
-import { BadgePercent, Rocket, Truck } from "lucide-react";
+import { BadgePercent, MapPin, Rocket } from "lucide-react";
 
 import { Reveal } from "./Reveal";
 
@@ -14,9 +14,9 @@ const BENEFITS = [
     body: "Be the first to try it — before launch",
   },
   {
-    Icon: Truck,
-    title: "Priority Shipping",
-    body: "Ships before launch, straight to your door",
+    Icon: MapPin,
+    title: "Made in India",
+    body: "Formulated for Indian hair & climate",
   },
 ] as const;
 
